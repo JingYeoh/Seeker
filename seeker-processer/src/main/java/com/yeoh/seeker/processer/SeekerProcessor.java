@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
@@ -29,16 +28,13 @@ import javax.lang.model.type.TypeMirror;
 @AutoService(Processor.class)
 public class SeekerProcessor extends AbstractProcessor {
 
-    private Filer mFiler;
-    private Map<String, List<SeekerMethod>> mAnnotatedHideMap;
+    private Map<String, List<HideMethod>> mAnnotatedHideMap;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
-        mFiler = processingEnvironment.getFiler();
         mAnnotatedHideMap = new HashMap<>();
-        Log.d("=========================SEEKER PROCESSOR===================================");
-        Log.d("Seeker processor start ...");
+        Log.d("========================= SEEKER PROCESSOR ===================================");
     }
 
     @Override
@@ -48,7 +44,7 @@ public class SeekerProcessor extends AbstractProcessor {
                 processMethodElement((ExecutableElement) it);
             }
         }
-        return true;
+        return new SeekerDelegateGenerator(mAnnotatedHideMap).generate();
     }
 
     private void processMethodElement(ExecutableElement element) {
@@ -66,11 +62,11 @@ public class SeekerProcessor extends AbstractProcessor {
             params.add(paramClassName);
             Log.d("#### method params: " + paramClassName);
         }
-        List<SeekerMethod> seekerMethods = mAnnotatedHideMap.get(className);
+        List<HideMethod> seekerMethods = mAnnotatedHideMap.get(className);
         if (seekerMethods == null) {
             seekerMethods = new ArrayList<>();
         }
-        seekerMethods.add(new SeekerMethod(methodName, params));
+        seekerMethods.add(new HideMethod(methodName, params));
 
         mAnnotatedHideMap.put(className, seekerMethods);
     }

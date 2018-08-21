@@ -8,12 +8,12 @@ import java.util.List;
  * @author yangjing @ Zhihu Inc.
  * @since 2018-08-21
  */
-public class SeekerMethod {
+public class HideMethod {
 
     final String methodName;
     final List<String> params;
 
-    public SeekerMethod(String methodName, List<String> params) {
+    public HideMethod(String methodName, List<String> params) {
         this.methodName = methodName;
         this.params = params;
     }
