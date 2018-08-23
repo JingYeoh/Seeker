@@ -1,11 +1,18 @@
 package com.yeoh.seeker.processer;
 
+import static javax.lang.model.element.Modifier.FINAL;
+import static javax.lang.model.element.Modifier.PRIVATE;
+import static javax.lang.model.element.Modifier.STATIC;
+
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.MethodSpec.Builder;
+import com.squareup.javapoet.TypeSpec;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.processing.Filer;
-import javax.lang.model.element.Modifier;
 
 /**
  * Used to generate SeekerDelegate class code .
@@ -31,15 +38,40 @@ class SeekerDelegateGenerator {
             Log.d("@Hide is not found in project!!!");
             return false;
         }
-        Builder constructorBuilder = MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PUBLIC);
+        ClassName delegateName = ClassName.get(SEEKER_DELEGATE_CLASS, SEEKER_DELEGATE_PACKAGE);
+        FieldSpec instanceField = generateInstanceField(delegateName);
+        Builder constructorBuilder = generateConstructor();
+
+        TypeSpec.classBuilder(delegateName);
         for (String className : mAnnotatedHideMap.keySet()) {
             List<HideMethod> methods = mAnnotatedHideMap.get(className);
             for (HideMethod method : methods) {
-
+                constructorBuilder.addStatement("");
             }
         }
+        MethodSpec constructor = constructorBuilder.build();
+
 
         return true;
+    }
+
+    private FieldSpec generateInstanceField(ClassName delegateName) {
+        return FieldSpec.builder(String.class, "sInstance")
+                .addModifiers(PRIVATE, STATIC, FINAL)
+                .initializer("new $T", delegateName)
+                .build();
+    }
+
+    private FieldSpec generateHideMap() {
+        ClassName map = ClassName.get("java.util", "Map");
+        return FieldSpec.builder(String.class, "mHideMap")
+                .addModifiers(PRIVATE)
+                .initializer("new $T", HashMap.class)
+                .build();
+    }
+
+    private MethodSpec.Builder generateConstructor() {
+        return MethodSpec.constructorBuilder()
+                .addModifiers(PRIVATE);
     }
 }
