@@ -1,13 +1,17 @@
 apply plugin: 'com.android.application'
 
+def ext = rootProject.ext
+
 android {
-    compileSdkVersion 28
+    compileSdkVersion ext.android.compileSdkVersion
+    buildToolsVersion ext.android.buildToolsVersion
+
     defaultConfig {
-        applicationId "com.yeoh.example"
-        minSdkVersion 15
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        applicationId ext.app.applicationId
+        minSdkVersion ext.android.minSdkVersion
+        targetSdkVersion ext.android.targetSdkVersion
+        versionCode ext.app.targetSdkVersion
+        versionName ext.app.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -20,11 +24,11 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:28.0.0-beta01'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation ext.dependencies.appcompatV7
+    implementation ext.dependencies.constraintLayout
+    testImplementation ext.dependencies.junit
+    androidTestImplementation ext.dependencies.testRunner
+    androidTestImplementation ext.dependencies.testEspressoXore
 
     implementation project(':seeker-annotation')
     annotationProcessor project(':seeker-processer')

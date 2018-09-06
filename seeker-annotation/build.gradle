@@ -1,7 +1,9 @@
 apply plugin: 'java-library'
 
+def ext = rootProject.ext
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api ext.dependencies.supportAnnotations
 }
 
 sourceCompatibility = "1.8"

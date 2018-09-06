@@ -1,0 +1,82 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+ext {
+    app = [
+            appVerCode       : 1,
+            appVerName       : "1.1.0" + "-${releaseTime()}",
+            applicationId    : "com.yeoh.example",
+            versionNameSuffix: getCurrentVersionSuffix(),
+            minSdkVersion    : 14
+    ]
+
+    android = [
+            minSdkVersion             : 14,
+            targetSdkVersion          : 27,
+            compileSdkVersion         : 27,
+            buildToolsVersion         : "27.0.3",
+            sourceCompatibilityVersion: JavaVersion.VERSION_1_8,
+            targetCompatibilityVersion: JavaVersion.VERSION_1_8
+    ]
+
+    dependencies = [
+            appcompatV7       : 'com.android.support:appcompat-v7:27.1.1',
+            design            : 'com.android.support:design:27.1.1',
+            constraintLayout  : 'com.android.support.constraint:constraint-layout:1.1.3',
+            supportAnnotations: 'com.android.support:support-annotations:27.1.1',
+            aspectJ           : 'org.aspectj:aspectjrt:1.8.9',
+            javapoet          : 'com.squareup:javapoet:1.11.1',
+            autoSerivice      : 'com.google.auto.service:auto-service:1.0-rc3',
+            junit             : 'junit:junit:4.12',
+            testRunner        : 'com.android.support.test:runner:1.0.2',
+            testEspressoXore  : 'com.android.support.test.espresso:espresso-core:3.0.2'
+    ]
+
+    store = [
+            storeKey     : '../sign/JustKiddingBaby.jks',
+            storePassword: 'mimajiushiwo',
+            keyAlias     : 'JustKiddingBaby',
+            keyPassword  : 'mimajiushiwo'
+    ]
+
+    seeker = [
+            publishCode   : 1,
+            publishVersion: "1.0.0",
+            userOrg       : 'jkb',
+            groupId       : 'com.yeoh',
+            artifactId    : 'seeker',
+            desc          : 'A plugin can hide the public methods with Hide annotation and build jar and aar automatically.',
+            website       : 'https://github.com/JustKiddingBaby/Seeker'
+    ]
+}
+
+def static releaseTime() {
+    return new Date().format("yyyyMMdd", TimeZone.getTimeZone("GMT+8"))
+}
+
+def getCurrentVersionSuffix() {
+    def currentFlavor = getCurrentFlavor()
+    if (currentFlavor == "prod") {
+        return "-prod"
+    } else if (currentFlavor == "uat") {
+        return "-uat"
+    } else if (currentFlavor == "dev") {
+        return "-dev"
+    }
+}
+
+def getCurrentFlavor() {
+    String taskRequestName = getGradle().getStartParameter().getTaskRequests().toString()
+    Pattern pattern
+    if (taskRequestName.contains("assemble")) {
+        pattern = Pattern.compile("assemble(\\w+)(Release|Debug)")
+    } else {
+        pattern = Pattern.compile("generate(\\w+)(Release|Debug)")
+    }
+    Matcher matcher = pattern.matcher(taskRequestName)
+    if (matcher.find()) {
+        return matcher.group(1).toLowerCase()
+    } else {
+        return ""
+    }
+}
