@@ -13,6 +13,14 @@ android {
         versionCode ext.app.targetSdkVersion
         versionName ext.app.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        moduleNameOfSeeker: 'app'
+                ]
+            }
+        }
     }
     buildTypes {
         release {
@@ -30,6 +38,6 @@ dependencies {
     androidTestImplementation ext.dependencies.testRunner
     androidTestImplementation ext.dependencies.testEspressoXore
 
-    implementation project(':seeker-annotation')
+    implementation project(':seeker')
     annotationProcessor project(':seeker-processer')
 }

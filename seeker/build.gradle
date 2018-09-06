@@ -1,30 +1,9 @@
-apply plugin: 'com.android.library'
-
-def ext = rootProject.ext
-
-android {
-    compileSdkVersion ext.android.compileSdkVersion
-    buildToolsVersion ext.android.buildToolsVersion
-
-    defaultConfig {
-        minSdkVersion ext.app.minSdkVersion
-        targetSdkVersion ext.app.targetSdkVersion
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility ext.android.sourceCompatibilityVersion
-        targetCompatibility ext.android.targetCompatibilityVersion
-    }
-}
+apply plugin: 'java-library'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api project(':seeker-annotation')
 }
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
