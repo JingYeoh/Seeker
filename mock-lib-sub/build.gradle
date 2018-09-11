@@ -7,13 +7,19 @@ android {
     buildToolsVersion ext.android.buildToolsVersion
 
     defaultConfig {
-        applicationId ext.app.applicationId
         minSdkVersion ext.android.minSdkVersion
         targetSdkVersion ext.android.targetSdkVersion
         versionCode ext.app.targetSdkVersion
         versionName ext.app.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        subModulesOfSeeker: 'mock-lib'
+                ]
+            }
+        }
     }
     buildTypes {
         release {
@@ -27,10 +33,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation ext.dependencies.appcompatV7
     implementation ext.dependencies.constraintLayout
-    testImplementation ext.dependencies.junit
-    androidTestImplementation ext.dependencies.testRunner
-    androidTestImplementation ext.dependencies.testEspressoXore
 
+    api project(':mock-lib')
     implementation project(':seeker')
     annotationProcessor project(':seeker-processer')
 }

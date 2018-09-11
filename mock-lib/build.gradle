@@ -1,9 +1,39 @@
-apply plugin: 'java-library'
+apply plugin: 'com.android.library'
+
+def ext = rootProject.ext
+
+android {
+    compileSdkVersion ext.android.compileSdkVersion
+    buildToolsVersion ext.android.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion ext.android.minSdkVersion
+        targetSdkVersion ext.android.targetSdkVersion
+        versionCode ext.app.targetSdkVersion
+        versionName ext.app.versionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        moduleNameOfSeeker: 'mock-lib'
+                ]
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':seeker')
-}
+    implementation ext.dependencies.appcompatV7
+    implementation ext.dependencies.constraintLayout
 
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
+    implementation project(':seeker')
+    annotationProcessor project(':seeker-processer')
+}

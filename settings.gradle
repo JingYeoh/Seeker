@@ -1,1 +1,1 @@
-include ':app', ':mock-lib', ':seeker-annotation', ':seeker-processer', ':seeker-plugins', ':seeker'
+include ':app', ':seeker-annotation', ':seeker-processer', ':seeker-plugins', ':seeker', ':mock-lib-sub', ':mock-lib'
