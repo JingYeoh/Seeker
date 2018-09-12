@@ -1,17 +1,14 @@
 package com.yeoh.seeker.processer;
 
 import android.support.annotation.NonNull;
-
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import com.yeoh.seeker.annotation.Hide;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
@@ -39,12 +36,14 @@ class SeekerDelegateGenerator {
     private RoundEnvironment mRoundEnvironment;
     private Filer mFiler;
 
-    public SeekerDelegateGenerator(String subModules, String moduleName, Filer filer, RoundEnvironment roundEnvironment) {
+    public SeekerDelegateGenerator(String subModules, String moduleName, Filer filer,
+            RoundEnvironment roundEnvironment) {
         mModuleName = moduleName;
         mRoundEnvironment = roundEnvironment;
         mFiler = filer;
-        Log.d("## subModules: " + subModules);
-        Log.d("## moduleName: " + moduleName);
+        if (subModules != null && subModules.length() > 0) {
+            mSubModuleNames = subModules.split(",");
+        }
     }
 
     public boolean generate() throws IOException {
@@ -52,23 +51,29 @@ class SeekerDelegateGenerator {
             return false;
         }
         generateModuleClass();
-        // generate sub module class
         return true;
     }
 
     // generate module class
     private void generateModuleClass() throws IOException {
-        if (mModuleName == null) {
-            return;
-        }
-        TypeSpec.Builder moduleBuilder = buildClass(getModuleClassName(mModuleName));
+        TypeSpec.Builder moduleBuilder = TypeSpec.classBuilder(getModuleClassName(mModuleName))
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
         moduleBuilder.superclass(ClassName.bestGuess(PACKAGE + "." + SEEKER_DELEGATE));
         MethodSpec.Builder moduleConstructor = MethodSpec.constructorBuilder();
         moduleConstructor.addStatement("super()");
 
-        for (Element it : mRoundEnvironment.getElementsAnnotatedWith(Hide.class)) {
+        for (Element it: mRoundEnvironment.getElementsAnnotatedWith(Hide.class)) {
             if (it instanceof ExecutableElement) {
-                processMethodElement((ExecutableElement) it, moduleConstructor);
+                appendMethodElement((ExecutableElement) it, moduleConstructor);
+            }
+        }
+        if (mSubModuleNames != null && mSubModuleNames.length > 0) {
+            for (String name: mSubModuleNames) {
+                moduleConstructor.addStatement("mHideMethods.putAll(new "
+                        + getModuleClassName(name)
+                        + "().getHideMethods()"
+                        + ")"
+                );
             }
         }
         moduleBuilder.addMethod(moduleConstructor.build());
@@ -77,31 +82,22 @@ class SeekerDelegateGenerator {
         moduleFile.writeTo(mFiler);
     }
 
-    private void processMethodElement(ExecutableElement element, MethodSpec.Builder moduleConstructor) {
+    private void appendMethodElement(ExecutableElement element, MethodSpec.Builder moduleConstructor) {
         TypeElement typeElement = (TypeElement) element.getEnclosingElement();
 
         String className = typeElement.getQualifiedName().toString();
         String methodName = element.getSimpleName().toString();
         List<String> params = new ArrayList<>();
 
-        Log.d("## found method " + className + "." + methodName);
-
-        for (VariableElement it : element.getParameters()) {
+        for (VariableElement it: element.getParameters()) {
             TypeMirror methodParameterType = it.asType();
             String paramClassName = methodParameterType.toString();
             params.add(paramClassName);
-            Log.d("#### method params: " + paramClassName);
         }
-
         moduleConstructor.addStatement("addHideMethod($S, "
                         + buildHideMethod(methodName, params)
                         + ")",
                 className);
-    }
-
-    private TypeSpec.Builder buildClass(String className) {
-        return TypeSpec.classBuilder(className)
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
     }
 
     private String buildHideMethod(@NonNull String methodName, @NonNull List<String> params) {
@@ -126,6 +122,9 @@ class SeekerDelegateGenerator {
     }
 
     private String getModuleClassName(String name) {
-        return SEEKER_DELEGATE_IMPL + Math.abs(name.hashCode());
+        if (name == null) {
+            return SEEKER_DELEGATE_IMPL;
+        }
+        return SEEKER_DELEGATE_IMPL + Math.abs(name.trim().hashCode());
     }
 }
