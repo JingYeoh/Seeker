@@ -87,6 +87,7 @@ class SeekerDelegateGenerator {
 
         String className = typeElement.getQualifiedName().toString();
         String methodName = element.getSimpleName().toString();
+        Hide hide = element.getAnnotation(Hide.class);
         List<String> params = new ArrayList<>();
 
         for (VariableElement it: element.getParameters()) {
@@ -94,29 +95,21 @@ class SeekerDelegateGenerator {
             String paramClassName = methodParameterType.toString();
             params.add(paramClassName);
         }
-        moduleConstructor.addStatement("addHideMethod($S, "
-                        + buildHideMethod(methodName, params)
-                        + ")",
-                className);
+        moduleConstructor.addStatement("addHideMethod($S,new " + HIDE_METHOD + "($S,$S,$S))", className,
+                methodName, hide.value().toString(), buildHideMethod(params));
     }
 
-    private String buildHideMethod(@NonNull String methodName, @NonNull List<String> params) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("new")
-                .append(" ")
-                .append(HIDE_METHOD)
-                .append("(")
-                .append("\"")
-                .append(methodName)
-                .append("\"");
-        for (int i = 0; i < params.size(); i++) {
-            builder.append(", ");
-            builder.append("\"");
-            builder.append(params.get(i));
-            builder.append("\"");
+    private String buildHideMethod(@NonNull List<String> params) {
+        if (params.isEmpty()) {
+            return null;
         }
-        builder.append(")");
-
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < params.size(); i++) {
+            if (i != 0) {
+                builder.append(",");
+            }
+            builder.append(params.get(i));
+        }
         Log.d(builder.toString());
         return builder.toString();
     }

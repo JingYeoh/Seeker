@@ -1,5 +1,7 @@
 package com.yeoh.seeker;
 
+import com.yeoh.seeker.annotation.Modifier;
+
 /**
  * Used to save method info
  *
@@ -10,10 +12,29 @@ public class HideMethod {
 
     private final String methodName;
     private final String[] params;
+    private String modifier;
 
-    public HideMethod(String methodName, String... params) {
+    public HideMethod(String methodName, String modifier, String params) {
         this.methodName = methodName;
-        this.params = params;
+        this.modifier = modifier;
+        if (params != null && params.length() > 0) {
+            this.params = params.split(params);
+        } else {
+            this.params = null;
+        }
+    }
+
+    public Modifier getModifier() {
+        if (modifier.equals(Modifier.DEFAULT.toString())) {
+            return Modifier.DEFAULT;
+        } else if (modifier.equals(Modifier.PRIVATE.toString())) {
+            return Modifier.PRIVATE;
+        } else if (modifier.equals(Modifier.PUBLIC.toString())) {
+            return Modifier.PUBLIC;
+        } else if (modifier.equals(Modifier.PROTECTED.toString())) {
+            return Modifier.PROTECTED;
+        }
+        return Modifier.DEFAULT;
     }
 
     @Override

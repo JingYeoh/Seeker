@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The method annotated with {@link Hide} will be packed out to private method in jar/aar .
+ * The method annotated with {@link Hide} will be packed out to jar/aar after method's modifier is changed .
  *
  * @author JingYeoh
  * @since 2018-08-09
@@ -18,7 +18,7 @@ public @interface Hide {
     /**
      * Allow or not processed .
      *
-     * @return default value is true .
+     * @return default value is {@link Modifier#PRIVATE} .
      */
-    boolean value() default true;
+    Modifier value() default Modifier.PRIVATE;
 }
