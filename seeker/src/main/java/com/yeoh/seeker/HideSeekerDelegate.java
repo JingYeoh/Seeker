@@ -7,6 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Used to save object annotated with {@link com.yeoh.seeker.annotation.Hide} .
+ *
+ * @author yangjing @ Zhihu Inc.
+ * @since 2018-09-06
+ */
 public class HideSeekerDelegate {
 
     protected Map<String, List<HideMethod>> mHideMethods;
