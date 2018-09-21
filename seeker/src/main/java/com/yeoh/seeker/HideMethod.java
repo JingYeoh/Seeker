@@ -66,9 +66,14 @@ public class HideMethod {
     }
 
     public String generateCode() {
+        return generateCodeStr(HideMethod.class.getSimpleName());
+    }
+
+
+    public String generateCodeStr(String name) {
         StringBuilder builder = new StringBuilder();
         builder.append("new ")
-                .append(HideMethod.class.getSimpleName())
+                .append(name)
                 .append("(")
                 .append("\"")
                 .append(methodName)
@@ -93,5 +98,9 @@ public class HideMethod {
         }
         builder.append(")");
         return builder.toString();
+    }
+
+    public String generateCodeWithJavaPoet() {
+        return generateCodeStr("$T");
     }
 }

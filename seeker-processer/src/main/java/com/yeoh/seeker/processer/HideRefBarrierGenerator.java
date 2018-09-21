@@ -43,9 +43,10 @@ class HideRefBarrierGenerator {
         }
     }
 
-    private void generateHideRefBarrier(String className, List<HideMethod> hideMethods) throws IOException {
-        String[] splitStr = className.split("\\.");
-        className = splitStr[splitStr.length - 1];
+    private void generateHideRefBarrier(String classFullName, List<HideMethod> hideMethods) throws IOException {
+        String[] splitStr = classFullName.split("\\.");
+        String className = splitStr[splitStr.length - 1];
+        String packageName = classFullName.substring(0, classFullName.length() - className.length() - 1);
 
         TypeSpec.Builder moduleBuilder = TypeSpec.classBuilder(className + SUFFIX)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
@@ -64,22 +65,22 @@ class HideRefBarrierGenerator {
             if (methodArgs == null) {
                 methodBuilder.addStatement("invokeMethod("
                         + buildInvokeMethod(hideMethod)
-                        + ")");
+                        + ")", HideMethod.class);
             } else {
                 methodBuilder.addStatement("invokeMethod("
                         + buildInvokeMethod(hideMethod)
-                        + ", $N)", methodArgs);
+                        + ", $N)", HideMethod.class, methodArgs);
             }
             moduleBuilder.addMethod(methodBuilder.build());
         }
 
-        JavaFile moduleFile = JavaFile.builder(PACKAGE, moduleBuilder.build())
+        JavaFile moduleFile = JavaFile.builder(packageName, moduleBuilder.build())
                 .build();
         moduleFile.writeTo(mFiler);
     }
 
     private String buildInvokeMethod(HideMethod hideMethod) {
-        return "reflectMethod(" + hideMethod.generateCode() + ")";
+        return "reflectMethod(" + hideMethod.generateCodeWithJavaPoet() + ")";
     }
 
     private String buildArgs(String[] args) {
