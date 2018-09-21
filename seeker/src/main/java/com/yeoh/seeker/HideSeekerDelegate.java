@@ -37,7 +37,7 @@ public class HideSeekerDelegate {
             return false;
         }
         for (HideMethod it: hideMethods) {
-            if (it.equals(hideMethod)) {
+             if (it.equals(hideMethod)) {
                 return true;
             }
         }

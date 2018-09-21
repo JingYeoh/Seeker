@@ -10,15 +10,15 @@ import com.yeoh.seeker.annotation.Modifier;
  */
 public class HideMethod {
 
-    private final String methodName;
-    private final String[] params;
-    private String modifier;
+    public final String methodName;
+    public final String[] params;
+    private final String modifier;
 
     public HideMethod(String methodName, String modifier, String params) {
         this.methodName = methodName;
         this.modifier = modifier;
         if (params != null && params.length() > 0) {
-            this.params = params.split(params);
+            this.params = params.split(",");
         } else {
             this.params = null;
         }
@@ -63,5 +63,35 @@ public class HideMethod {
             }
         }
         return true;
+    }
+
+    public String generateCode() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("new ")
+                .append(HideMethod.class.getSimpleName())
+                .append("(")
+                .append("\"")
+                .append(methodName)
+                .append("\"")
+                .append(",")
+                .append("\"")
+                .append(modifier)
+                .append("\"")
+                .append(",");
+        if (params != null && params.length > 0) {
+            builder.append("\"");
+            for (int i = 0; i < params.length; i++) {
+                String arg = params[i];
+                if (i != 0) {
+                    builder.append(",");
+                }
+                builder.append(arg);
+            }
+            builder.append("\"");
+        } else {
+            builder.append("null");
+        }
+        builder.append(")");
+        return builder.toString();
     }
 }

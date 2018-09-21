@@ -5,10 +5,15 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import com.yeoh.seeker.HideMethod;
+import com.yeoh.seeker.HideSeekerDelegate;
 import com.yeoh.seeker.annotation.Hide;
+import com.yeoh.seeker.processer.utils.Log;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
@@ -21,22 +26,23 @@ import javax.lang.model.type.TypeMirror;
 /**
  * Used to generate SeekerDelegate class code .
  *
- * @author yangjing @ Zhihu Inc.
+ * @author yangjing .
  * @since 2018-08-21
  */
 class SeekerDelegateGenerator {
 
     private static final String PACKAGE = "com.yeoh.seeker";
     private static final String SEEKER_DELEGATE_IMPL = "HideSeekerDelegateImpl";
-    private static final String SEEKER_DELEGATE = "HideSeekerDelegate";
-    private static final String HIDE_METHOD = "HideMethod";
+    private static final String SEEKER_DELEGATE = HideSeekerDelegate.class.getSimpleName();
+    private static final String HIDE_METHOD = HideMethod.class.getSimpleName();
 
     private String mSubModuleNames[];
     private String mModuleName;
     private RoundEnvironment mRoundEnvironment;
     private Filer mFiler;
+    private Map<String, List<HideMethod>> mHideMethodMap;
 
-    public SeekerDelegateGenerator(String subModules, String moduleName, Filer filer,
+    SeekerDelegateGenerator(String subModules, String moduleName, Filer filer,
             RoundEnvironment roundEnvironment) {
         mModuleName = moduleName;
         mRoundEnvironment = roundEnvironment;
@@ -44,13 +50,15 @@ class SeekerDelegateGenerator {
         if (subModules != null && subModules.length() > 0) {
             mSubModuleNames = subModules.split(",");
         }
+        mHideMethodMap = new HashMap<>();
     }
 
-    public boolean generate() throws IOException {
+    boolean generate() throws IOException {
         if (mSubModuleNames == null && mModuleName == null) {
             return false;
         }
         generateModuleClass();
+        new HideRefBarrierGenerator(mFiler, mHideMethodMap).generate();
         return true;
     }
 
@@ -96,10 +104,12 @@ class SeekerDelegateGenerator {
             params.add(paramClassName);
         }
         moduleConstructor.addStatement("addHideMethod($S,new " + HIDE_METHOD + "($S,$S,$S))", className,
-                methodName, hide.value().toString(), buildHideMethod(params));
+                methodName, hide.value().toString(), buildHideMethodParams(params));
+
+        putHideMethod(className, methodName, hide.value().toString(), buildHideMethodParams(params));
     }
 
-    private String buildHideMethod(@NonNull List<String> params) {
+    private String buildHideMethodParams(@NonNull List<String> params) {
         if (params.isEmpty()) {
             return null;
         }
@@ -119,5 +129,15 @@ class SeekerDelegateGenerator {
             return SEEKER_DELEGATE_IMPL;
         }
         return SEEKER_DELEGATE_IMPL + Math.abs(name.trim().hashCode());
+    }
+
+    private void putHideMethod(String className, String methodName, String modifier, String params) {
+        List<HideMethod> hideMethods = mHideMethodMap.get(className);
+        if (hideMethods == null) {
+            hideMethods = new ArrayList<>();
+        }
+        HideMethod hideMethod = new HideMethod(methodName, modifier, params);
+        hideMethods.add(hideMethod);
+        mHideMethodMap.put(className, hideMethods);
     }
 }

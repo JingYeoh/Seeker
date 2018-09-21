@@ -5,7 +5,7 @@ dependencies {
     implementation 'com.squareup:javapoet:1.9.0'
     implementation 'com.google.auto.service:auto-service:1.0-rc3'
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation project(':seeker-annotation')
+    implementation project(':seeker')
 }
 
 sourceCompatibility = "1.8"

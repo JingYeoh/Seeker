@@ -7,33 +7,33 @@ import java.util.Map;
 /**
  * Used to save reflect object .
  *
- * @author yangjing @ Zhihu Inc.
+ * @author yangjing .
  * @since 2018-09-15
  */
 public class HideRefFactory {
 
-    private static Map<Class, Map<String, Method>> methodMap;
+    private static Map<Class, Map<HideMethod, Method>> methodMap;
 
-    protected static Method getMethod(Class refName, String name) {
+    static Method getMethod(Class refName, HideMethod hideMethod) {
         if (methodMap == null) {
             return null;
         }
-        Map<String, Method> methods = methodMap.get(refName);
+        Map<HideMethod, Method> methods = methodMap.get(refName);
         if (methods == null) {
             return null;
         }
-        return methods.get(name);
+        return methods.get(hideMethod);
     }
 
-    protected static void putMethod(Class refName, String name, Method method) {
+    static void putMethod(Class refName, HideMethod hideMethod, Method method) {
         if (methodMap == null) {
             methodMap = new HashMap<>();
         }
-        Map<String, Method> methods = methodMap.get(refName);
+        Map<HideMethod, Method> methods = methodMap.get(refName);
         if (methods == null) {
             methods = new HashMap<>();
             methodMap.put(refName, methods);
         }
-        methods.put(name, method);
+        methods.put(hideMethod, method);
     }
 }
