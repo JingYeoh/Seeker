@@ -5,11 +5,16 @@ apply from: 'config.gradle'
 buildscript {
 
     repositories {
+        maven {
+            url uri('./repo')
+        }
         google()
         jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.4'
+
+        classpath 'com.yeoh.plugin:seeker-plugin:0.0.1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

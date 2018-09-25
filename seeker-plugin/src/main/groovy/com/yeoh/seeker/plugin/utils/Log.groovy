@@ -1,4 +1,4 @@
-package com.yeoh.seeker.plugins.utils
+package com.yeoh.seeker.plugin.utils
 import java.util.logging.Logger
 
 /**

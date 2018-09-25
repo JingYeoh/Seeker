@@ -1,10 +1,10 @@
-package com.yeoh.seeker.plugins
+package com.yeoh.seeker.plugin
 
 import com.android.build.gradle.AppExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-class SeekerPlugins implements Plugin<Project> {
+class SeekerPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {

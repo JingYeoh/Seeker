@@ -1,11 +1,11 @@
-package com.yeoh.seeker.plugins
+package com.yeoh.seeker.plugin
 
 import com.android.build.api.transform.QualifiedContent
 import com.android.build.api.transform.Transform
 import com.android.build.api.transform.TransformException
 import com.android.build.api.transform.TransformInvocation
 import com.android.build.gradle.internal.pipeline.TransformManager
-import com.yeoh.seeker.plugins.utils.Log
+import com.yeoh.seeker.plugin.utils.Log
 import javassist.ClassPool
 import org.gradle.api.Project
 
@@ -26,7 +26,7 @@ class SeekerTransform extends Transform {
 
     @Override
     Set<QualifiedContent.ContentType> getInputTypes() {
-        return TransformManager.CONTENT_CLASS
+        return TransformManager.CONTENT_RESOURCES
     }
 
     @Override
@@ -45,17 +45,16 @@ class SeekerTransform extends Transform {
 
         mProject.task('seeker') {
             doLast {
-                Log.d("Hello from SeekerPlugins")
+                Log.d("Hello from SeekerPlugin")
             }
         }
 
         Log.d('------------- Seeker start -----------------')
-
-        transformInvocation.inputs.forEach({
-            it.jarInputs.forEach({
-                Log.d(it.file.absolutePath)
-                Log.d(it.name)
-            })
-        })
+//        transformInvocation.inputs.forEach({
+//            it.jarInputs.forEach({
+//                Log.d(it.file.absolutePath)
+//                Log.d(it.name)
+//            })
+//        })
     }
 }
