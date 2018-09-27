@@ -21,14 +21,15 @@ public class HideRefBarrier {
         mClass = object.getClass();
     }
 
-    protected void invokeMethod(Method method, Object... args) {
+    protected Object invokeMethod(Method method, Object... args) {
         try {
-            method.invoke(object, args);
+            return method.invoke(object, args);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     protected Method reflectMethod(HideMethod hideMethod) {

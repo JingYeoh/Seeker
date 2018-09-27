@@ -1,11 +1,9 @@
 package com.yeoh.seeker.plugin
 
-import com.android.build.api.transform.QualifiedContent
-import com.android.build.api.transform.Transform
-import com.android.build.api.transform.TransformException
-import com.android.build.api.transform.TransformInvocation
+import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.yeoh.seeker.plugin.utils.Log
+import groovy.json.JsonSlurper
 import javassist.ClassPool
 import org.gradle.api.Project
 
@@ -42,13 +40,34 @@ class SeekerTransform extends Transform {
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation)
-
         Log.d('------------- Seeker start -----------------')
+        readSeekerConfig(transformInvocation.inputs)
         transformInvocation.inputs.forEach({
             it.jarInputs.forEach({
                 Log.d(it.file.absolutePath)
                 Log.d(it.name)
             })
         })
+    }
+
+    /**
+     * read seeker config from json file
+     */
+    private static void readSeekerConfig(Collection<TransformInput> inputs) {
+        DataSource.clear()
+        inputs.each { TransformInput input ->
+            input.directoryInputs.each { DirectoryInput directoryInput ->
+                File configFile = new File(directoryInput.file.absolutePath + "com/yeoh/seeker/seeker.json")
+                Log.d(configFile.path)
+                if (configFile.exists()) {
+                    def content = new StringBuilder()
+                    configFile.eachLine("UTF-8") {
+                        content.append(it)
+                    }
+                    def data = new JsonSlurper().parseText(content.toString())
+
+                }
+            }
+        }
     }
 }

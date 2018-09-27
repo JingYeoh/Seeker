@@ -19,6 +19,11 @@ public @interface Hide {
      * Allow or not processed .
      *
      * @return default value is {@link Modifier#PRIVATE} .
+     *
+     * @see Modifier#PRIVATE
+     * @see Modifier#DEFAULT
+     * @see Modifier#PUBLIC
+     * @see Modifier#PROTECTED
      */
     Modifier value() default Modifier.PRIVATE;
 }

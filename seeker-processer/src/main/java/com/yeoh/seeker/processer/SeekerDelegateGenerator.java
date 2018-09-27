@@ -96,6 +96,7 @@ class SeekerDelegateGenerator {
 
         String className = typeElement.getQualifiedName().toString();
         String methodName = element.getSimpleName().toString();
+        String returnName = element.getReturnType().toString();
         Hide hide = element.getAnnotation(Hide.class);
         List<String> params = new ArrayList<>();
 
@@ -104,10 +105,10 @@ class SeekerDelegateGenerator {
             String paramClassName = methodParameterType.toString();
             params.add(paramClassName);
         }
-        moduleConstructor.addStatement("addHideMethod($S,new " + HIDE_METHOD + "($S,$S,$S))", className,
-                methodName, hide.value().toString(), buildHideMethodParams(params));
+        moduleConstructor.addStatement("addHideMethod($S,new " + HIDE_METHOD + "($S,$S,$S,$S))", className,
+                methodName, returnName, hide.value().toString(), buildHideMethodParams(params));
 
-        putHideMethod(className, methodName, hide.value().toString(), buildHideMethodParams(params));
+        putHideMethod(className, methodName, returnName, hide.value().toString(), buildHideMethodParams(params));
     }
 
     private String buildHideMethodParams(@NonNull List<String> params) {
@@ -132,12 +133,12 @@ class SeekerDelegateGenerator {
         return SEEKER_DELEGATE_IMPL + Math.abs(name.trim().hashCode());
     }
 
-    private void putHideMethod(String className, String methodName, String modifier, String params) {
+    private void putHideMethod(String className, String methodName, String returnName, String modifier, String params) {
         List<HideMethod> hideMethods = mHideMethodMap.get(className);
         if (hideMethods == null) {
             hideMethods = new ArrayList<>();
         }
-        HideMethod hideMethod = new HideMethod(methodName, modifier, params);
+        HideMethod hideMethod = new HideMethod(methodName, returnName, modifier, params);
         hideMethods.add(hideMethod);
         mHideMethodMap.put(className, hideMethods);
     }

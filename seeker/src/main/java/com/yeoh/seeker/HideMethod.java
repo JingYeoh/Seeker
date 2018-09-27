@@ -13,10 +13,12 @@ public class HideMethod {
     public final String methodName;
     public final String[] params;
     private final String modifier;
+    private final String returnValue;
 
-    public HideMethod(String methodName, String modifier, String params) {
+    public HideMethod(String methodName, String returnValue, String modifier, String params) {
         this.methodName = methodName;
         this.modifier = modifier;
+        this.returnValue = returnValue;
         if (params != null && params.length() > 0) {
             this.params = params.split(",");
         } else {
@@ -77,6 +79,10 @@ public class HideMethod {
                 .append("(")
                 .append("\"")
                 .append(methodName)
+                .append("\"")
+                .append(",")
+                .append("\"")
+                .append(returnValue)
                 .append("\"")
                 .append(",")
                 .append("\"")
