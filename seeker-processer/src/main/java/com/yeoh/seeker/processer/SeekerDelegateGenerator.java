@@ -59,6 +59,7 @@ class SeekerDelegateGenerator {
         }
         generateModuleClass();
         new HideRefBarrierGenerator(mFiler, mHideMethodMap).generate();
+        new SeekerDelegateJsonGenerator(mFiler, mHideMethodMap).generate();
         return true;
     }
 

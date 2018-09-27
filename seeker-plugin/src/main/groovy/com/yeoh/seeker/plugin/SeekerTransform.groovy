@@ -26,7 +26,7 @@ class SeekerTransform extends Transform {
 
     @Override
     Set<QualifiedContent.ContentType> getInputTypes() {
-        return TransformManager.CONTENT_RESOURCES
+        return TransformManager.CONTENT_CLASS
     }
 
     @Override
@@ -43,18 +43,12 @@ class SeekerTransform extends Transform {
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation)
 
-        mProject.task('seeker') {
-            doLast {
-                Log.d("Hello from SeekerPlugin")
-            }
-        }
-
         Log.d('------------- Seeker start -----------------')
-//        transformInvocation.inputs.forEach({
-//            it.jarInputs.forEach({
-//                Log.d(it.file.absolutePath)
-//                Log.d(it.name)
-//            })
-//        })
+        transformInvocation.inputs.forEach({
+            it.jarInputs.forEach({
+                Log.d(it.file.absolutePath)
+                Log.d(it.name)
+            })
+        })
     }
 }

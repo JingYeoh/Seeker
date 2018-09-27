@@ -31,11 +31,12 @@ public class SeekerProcessor extends AbstractProcessor {
     static final String OPTION_SUB_MODULES = "subModulesOfSeeker";
 
     private Filer mFiler;
+    private boolean mHasProcess;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
-        Log.d("========================= SEEKER PROCESSOR ===================================");
+        Log.print("========================= SEEKER PROCESSOR ===================================");
         mFiler = processingEnvironment.getFiler();
     }
 
@@ -43,12 +44,15 @@ public class SeekerProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         String moduleName = processingEnv.getOptions().get(OPTION_MODULE_NAME);
         String subModules = processingEnv.getOptions().get(OPTION_SUB_MODULES);
+        if (mHasProcess) {
+            return false;
+        }
         try {
-            return new SeekerDelegateGenerator(subModules, moduleName, mFiler, roundEnvironment).generate();
+            mHasProcess = new SeekerDelegateGenerator(subModules, moduleName, mFiler, roundEnvironment).generate();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
+        return mHasProcess;
     }
 
     @Override

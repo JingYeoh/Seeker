@@ -31,8 +31,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation ext.dependencies.appcompatV7
-    implementation ext.dependencies.constraintLayout
 
     implementation project(':seeker')
     annotationProcessor project(':seeker-processer')

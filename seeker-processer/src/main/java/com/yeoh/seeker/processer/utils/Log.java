@@ -8,7 +8,15 @@ package com.yeoh.seeker.processer.utils;
  */
 public class Log {
 
-    public static void d(String info) {
+    private static boolean ableDebug = false;
+
+    public static void print(String info) {
         System.out.println(info);
+    }
+
+    public static void d(String info) {
+        if (ableDebug) {
+            print(info);
+        }
     }
 }
