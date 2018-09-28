@@ -55,6 +55,7 @@ class SeekerDelegateGenerator {
 
     boolean generate() throws IOException {
         if (mSubModuleNames == null && mModuleName == null) {
+            Log.w("subModuleName and moduleName is null , don't process this module");
             return false;
         }
         generateModuleClass();
@@ -65,6 +66,7 @@ class SeekerDelegateGenerator {
 
     // generate module class
     private void generateModuleClass() throws IOException {
+        Log.title("========== Generate seeker delegate start ==========");
         TypeSpec.Builder moduleBuilder = TypeSpec.classBuilder(getModuleClassName(mModuleName))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
         moduleBuilder.superclass(ClassName.bestGuess(PACKAGE + "." + SEEKER_DELEGATE));
@@ -89,6 +91,7 @@ class SeekerDelegateGenerator {
         JavaFile moduleFile = JavaFile.builder(PACKAGE, moduleBuilder.build())
                 .build();
         moduleFile.writeTo(mFiler);
+        Log.title("========== Generate seeker delegate end ==========");
     }
 
     private void appendMethodElement(ExecutableElement element, MethodSpec.Builder moduleConstructor) {
@@ -100,15 +103,21 @@ class SeekerDelegateGenerator {
         Hide hide = element.getAnnotation(Hide.class);
         List<String> params = new ArrayList<>();
 
+        Log.second("----- addHideMethod start...");
+        Log.i("className = " + className);
+        Log.i("methodName = " + methodName);
+        Log.i("returnName = " + returnName);
+
         for (VariableElement it: element.getParameters()) {
             TypeMirror methodParameterType = it.asType();
             String paramClassName = methodParameterType.toString();
             params.add(paramClassName);
         }
+        String hideMethodParams = buildHideMethodParams(params);
         moduleConstructor.addStatement("addHideMethod($S,new " + HIDE_METHOD + "($S,$S,$S,$S))", className,
-                methodName, returnName, hide.value().toString(), buildHideMethodParams(params));
-
-        putHideMethod(className, methodName, returnName, hide.value().toString(), buildHideMethodParams(params));
+                methodName, returnName, hide.value().toString(), hideMethodParams);
+        Log.second("----- addHideMethod done...");
+        putHideMethod(className, methodName, returnName, hide.value().toString(), hideMethodParams);
     }
 
     private String buildHideMethodParams(@NonNull List<String> params) {
@@ -122,7 +131,7 @@ class SeekerDelegateGenerator {
             }
             builder.append(params.get(i));
         }
-        Log.d(builder.toString());
+        Log.i("params = " + builder.toString());
         return builder.toString();
     }
 

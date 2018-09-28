@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.yeoh.seeker.HideMethod;
+import com.yeoh.seeker.processer.utils.Log;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -31,6 +32,10 @@ class SeekerDelegateJsonGenerator {
     }
 
     void generate() throws IOException {
+        if (mHideMethodMap.isEmpty()) {
+            Log.w("hideMethodMap is empty...");
+        }
+        Log.title("========== Generate JSON start ==========");
         FileObject fileObject = mFiler.getResource(StandardLocation.CLASS_OUTPUT, "",
                 "com/yeoh/seeker/seeker.json");
         File file = new File(fileObject.toUri());
@@ -41,5 +46,6 @@ class SeekerDelegateJsonGenerator {
         Writer writer = Files.newWriter(file, Charsets.UTF_8);
         new Gson().toJson(mHideMethodMap, writer);
         writer.close();
+        Log.title("========== Generate JSON end ==========");
     }
 }

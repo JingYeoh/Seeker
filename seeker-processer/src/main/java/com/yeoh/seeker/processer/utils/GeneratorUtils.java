@@ -25,6 +25,40 @@ public class GeneratorUtils {
             case "java.lang.Object":
                 return Object.class;
         }
+//        Class<?>[] classes = getClasses(className);
+//        if (classes != null) {
+//            return classes.getClass();
+//        }
         return null;
+    }
+
+    public static Class<?>[] getClasses(String className) {
+        if (className.trim().endsWith("[]")) {
+            String realClass = className.substring(0, className.length() - 2);
+            try {
+                Class<?> clazz = Class.forName(realClass);
+                return clazz.getClasses();
+            } catch (ClassNotFoundException e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public static String getArrayClassName(String className) {
+        if (className.trim().endsWith("[]")) {
+            return className.substring(0, className.length() - 2);
+        }
+        return null;
+    }
+
+    public static boolean isVoid(String className) {
+        if (className == null || className.length() == 0) {
+            return true;
+        }
+        if (className.toLowerCase().equals("void")) {
+            return true;
+        }
+        return false;
     }
 }

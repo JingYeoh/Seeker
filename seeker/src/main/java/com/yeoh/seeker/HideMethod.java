@@ -1,6 +1,7 @@
 package com.yeoh.seeker;
 
 import com.yeoh.seeker.annotation.Modifier;
+import java.util.Arrays;
 
 /**
  * Used to save method info
@@ -13,12 +14,12 @@ public class HideMethod {
     public final String methodName;
     public final String[] params;
     private final String modifier;
-    private final String returnValue;
+    public final String returns;
 
     public HideMethod(String methodName, String returnValue, String modifier, String params) {
         this.methodName = methodName;
         this.modifier = modifier;
-        this.returnValue = returnValue;
+        this.returns = returnValue;
         if (params != null && params.length() > 0) {
             this.params = params.split(",");
         } else {
@@ -67,10 +68,17 @@ public class HideMethod {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "methodName = " + methodName + "\n"
+                + "returns = " + returns + "\n"
+                + "modifier = " + modifier + "\n"
+                + "params = " + Arrays.toString(params);
+    }
+
     public String generateCode() {
         return generateCodeStr(HideMethod.class.getSimpleName());
     }
-
 
     public String generateCodeStr(String name) {
         StringBuilder builder = new StringBuilder();
@@ -82,7 +90,7 @@ public class HideMethod {
                 .append("\"")
                 .append(",")
                 .append("\"")
-                .append(returnValue)
+                .append(returns)
                 .append("\"")
                 .append(",")
                 .append("\"")
