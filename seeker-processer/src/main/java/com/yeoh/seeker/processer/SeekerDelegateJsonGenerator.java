@@ -4,7 +4,6 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.yeoh.seeker.HideMethod;
-import com.yeoh.seeker.processer.utils.Log;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;

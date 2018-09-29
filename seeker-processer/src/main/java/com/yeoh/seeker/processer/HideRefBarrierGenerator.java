@@ -8,8 +8,6 @@ import com.squareup.javapoet.MethodSpec.Builder;
 import com.squareup.javapoet.TypeSpec;
 import com.yeoh.seeker.HideMethod;
 import com.yeoh.seeker.HideRefBarrier;
-import com.yeoh.seeker.processer.utils.GeneratorUtils;
-import com.yeoh.seeker.processer.utils.Log;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.yeoh.seeker.processer.utils;
+package com.yeoh.seeker.processer;
 
 /**
  * Used to print log info
@@ -6,7 +6,7 @@ package com.yeoh.seeker.processer.utils;
  * @author yangjing @ Zhihu Inc.
  * @since 2018-08-21
  */
-public class Log {
+class Log {
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";

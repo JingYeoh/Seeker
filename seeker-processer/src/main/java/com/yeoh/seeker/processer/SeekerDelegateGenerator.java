@@ -8,7 +8,6 @@ import com.squareup.javapoet.TypeSpec;
 import com.yeoh.seeker.HideMethod;
 import com.yeoh.seeker.HideSeekerDelegate;
 import com.yeoh.seeker.annotation.Hide;
-import com.yeoh.seeker.processer.utils.Log;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,6 +1,6 @@
-package com.yeoh.seeker.processer.utils;
+package com.yeoh.seeker.processer;
 
-public class GeneratorUtils {
+class GeneratorUtils {
 
     public static Class getPrimitiveTypeClass(String className) {
         switch (className) {
