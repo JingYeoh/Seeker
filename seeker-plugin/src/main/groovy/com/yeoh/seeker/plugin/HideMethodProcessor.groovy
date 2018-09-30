@@ -13,7 +13,7 @@ class HideMethodProcessor {
         if (hideMethod == null) {
             return
         }
-        Log.d_("start process class :" + className)
+        Log.d("======== start process class :" + className)
 
     }
 }

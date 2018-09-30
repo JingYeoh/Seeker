@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils
 class JarInject {
 
     static void injectJar(path) throws Exception {
+        Log.d("---------- inject jar ------------")
         if (path.endsWith(".jar")) {
             File jarFile = new File(path)
             String jarZipDir = jarFile.getParent() + "/" + jarFile.getName().replace('.jar', '')
@@ -31,15 +32,16 @@ class JarInject {
     private static boolean traverseClassList(List classNameList, String jarZipDir) {
         boolean haveTarget = false
         boolean hasAppend = false
+        Log.d("DatSource.seekerConfig.keySet = " + DataSource.seekerConfig.keySet())
         for (String className : classNameList) {
             if (className.endsWith(".class")
                     && !className.contains('R$')
                     && !className.contains('R.class')
                     && !className.contains("BuildConfig.class")) {
                 className = className.substring(0, className.length() - 6)
-                for (String todo : DataSource.seekerConfig.keySet()) {
-                    if (className == todo || className.replace("\$", ".") == todo) {
-                        Log.d("traverseClassList className = " + className)
+//                Log.d("traverseClassList className = " + className)
+                DataSource.seekerConfig.keySet().forEach({
+                    if (className == it || className.replace("\$", ".") == it) {
                         if (!hasAppend) {
                             hasAppend = true
                             SeekerTransform.pool.appendClassPath(jarZipDir)
@@ -47,7 +49,7 @@ class JarInject {
                         haveTarget = true
                         processClass(className, jarZipDir)
                     }
-                }
+                })
             }
         }
         return haveTarget

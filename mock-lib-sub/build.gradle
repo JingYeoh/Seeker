@@ -1,5 +1,4 @@
-apply plugin: 'com.android.application'
-apply plugin: 'seeker-plugin'
+apply plugin: 'com.android.library'
 
 def ext = rootProject.ext
 
@@ -17,7 +16,7 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [
-                        subModulesOfSeeker: 'mock-lib'
+                        moduleNameOfSeeker: 'mock-lib-sub'
                 ]
             }
         }

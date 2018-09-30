@@ -57,9 +57,12 @@ class SeekerDelegateGenerator {
             Log.w("subModuleName and moduleName is null , don't process this module");
             return false;
         }
+        HideMethodCacher.readFromCache();
         generateModuleClass();
+        HideMethodCacher.putAll(mHideMethodMap);
         new HideRefBarrierGenerator(mFiler, mHideMethodMap).generate();
-        new SeekerDelegateJsonGenerator(mFiler, mHideMethodMap).generate();
+//        new SeekerDelegateJsonGenerator(mFiler, HideMethodCacher.getAll()).generate();
+        HideMethodCacher.cache();
         return true;
     }
 

@@ -12,7 +12,7 @@ import org.gradle.api.Project
 class SeekerTransform extends Transform {
 
     private Project mProject
-    ClassPool pool
+    static ClassPool pool
     static List<DirectoryInput> classFileList
     static List<String> jarPathList
     static List<CtClass> jarClassList
@@ -29,7 +29,7 @@ class SeekerTransform extends Transform {
 
     @Override
     Set<QualifiedContent.ContentType> getInputTypes() {
-        return TransformManager.CONTENT_CLASS
+        return TransformManager.CONTENT_JARS
     }
 
     @Override
@@ -76,7 +76,8 @@ class SeekerTransform extends Transform {
         DataSource.clear()
         inputs.each { TransformInput input ->
             input.directoryInputs.each { DirectoryInput directoryInput ->
-                File configFile = new File(directoryInput.file.absolutePath + "/com/yeoh/seeker/seeker.json")
+//                File configFile = new File(directoryInput.file.absolutePath + "/com/yeoh/seeker/seeker.json")
+                File configFile = new File("./build/Seeker/seeker.json")
                 Log.d(configFile.path)
                 if (configFile.exists()) {
                     def content = new StringBuilder()
@@ -87,7 +88,6 @@ class SeekerTransform extends Transform {
                     data.keySet().forEach {
                         DataSource.seekerConfig.put(it, data.get(it))
                     }
-                    Log.d("DataSource#SeekerConfig = " + DataSource.seekerConfig)
                 }
             }
         }

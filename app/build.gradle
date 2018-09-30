@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-//apply plugin: 'seeker-plugin'
+apply plugin: 'seeker-plugin'
 
 def ext = rootProject.ext
 
@@ -15,7 +15,15 @@ android {
         versionName ext.app.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        subModulesOfSeeker: 'mock-lib-sub,mock-lib'
+                ]
+            }
+        }
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -33,5 +41,7 @@ dependencies {
     androidTestImplementation ext.dependencies.testEspressoXore
 
     implementation project(':seeker')
+    implementation project(':mock-lib-sub')
+    implementation project(':mock-lib')
     annotationProcessor project(':seeker-processer')
 }
