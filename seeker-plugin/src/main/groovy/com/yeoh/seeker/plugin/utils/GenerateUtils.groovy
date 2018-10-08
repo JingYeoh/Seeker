@@ -1,30 +1,30 @@
 package com.yeoh.seeker.plugin.utils
 
 import javassist.CtMethod
-import javassist.Modifier
+import javassist.bytecode.AccessFlag
 
 class GenerateUtils {
 
-    static int getModifier(String modifier) {
+    static int getModifier(CtMethod method, String modifier) {
         if (modifier == null) {
             return -1
         }
         switch (modifier.toLowerCase()) {
             case "default":
-                return Modifier.PRIVATE
+                return AccessFlag.setPrivate(method.getModifiers())
             case "public":
-                return Modifier.PUBLIC
+                return AccessFlag.setPublic(method.getModifiers())
             case "private":
-                return Modifier.PRIVATE
+                return AccessFlag.setPrivate(method.getModifiers())
             case "protected":
-                return Modifier.PROTECTED
+                return AccessFlag.setProtected(method.getModifiers())
             default:
                 return -1
         }
     }
 
     static void changeModifier(CtMethod method, String modifier) {
-        int targetModifier = getModifier(modifier)
+        int targetModifier = getModifier(method, modifier)
         if (targetModifier < 0) {
             return
         }

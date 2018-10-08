@@ -19,13 +19,12 @@ class HideMethodProcessor {
             return
         }
         Log.d("======== start to process class :" + className)
+        Log.d("==== hideMethods = " + hideMethod)
 
         c.setModifiers(AccessFlag.setPublic(c.getModifiers()))
 
-        DataSource.seekerConfig.forEach({ key, value ->
-            value.forEach({
-                processTargetMethod(c, it)
-            })
+        hideMethod.forEach({
+            processTargetMethod(c, it)
         })
         Log.d("======== done")
     }
@@ -34,18 +33,17 @@ class HideMethodProcessor {
         Log.d("-------- start to change method: " + hideMethod.toString())
 //        CtClass returns = CtClass.forName(hideMethod.returns)
         CtClass returns = SeekerTransform.pool.getCtClass(hideMethod.returns)
-        Log.d("returns = " + returns)
+        Log.d("returns get success...")
         CtClass[] params = null
         if (hideMethod.params != null) {
-            params = new CtClass[hideMethod.length]
+            params = new CtClass[hideMethod.params.size()]
             for (int i = 0; i < params.length; i++) {
                 String className = hideMethod.params[i]
                 params[i] = SeekerTransform.pool.getCtClass(className)
             }
         }
-        Log.d("params = " + params)
         String descriptor = Descriptor.ofMethod(returns, params)
-        Log.d("descriptor = " + descriptor)
+        Log.d("descriptor get success...")
         CtMethod ctMethod = c.getMethod(hideMethod.methodName, descriptor)
         if (ctMethod == null) {
             ctMethod = c.getDeclaredMethod(hideMethod.methodName, params)

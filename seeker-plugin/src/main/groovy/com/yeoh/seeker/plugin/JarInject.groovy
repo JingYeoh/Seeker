@@ -32,7 +32,7 @@ class JarInject {
     private static boolean traverseClassList(List classNameList, String jarZipDir) {
         boolean haveTarget = false
         boolean hasAppend = false
-        Log.d("DatSource.seekerConfig.keySet = " + DataSource.seekerConfig.keySet())
+//        Log.d("DatSource.seekerConfig = " + DataSource.seekerConfig)
         for (String className : classNameList) {
             if (className.endsWith(".class")
                     && !className.contains('R$')
@@ -47,7 +47,7 @@ class JarInject {
                             SeekerTransform.pool.appendClassPath(jarZipDir)
                         }
                         haveTarget = true
-                        processClass(className, jarZipDir)
+                        processClass(it, jarZipDir)
                     }
                 })
             }
