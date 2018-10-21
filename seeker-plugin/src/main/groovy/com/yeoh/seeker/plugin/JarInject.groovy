@@ -18,6 +18,7 @@ class JarInject {
             try {
                 boolean haveTarget = traverseClassList(classNameList, jarZipDir)
                 if (haveTarget) {
+                    Log.d("found jar target :" + jarZipDir)
                     jarFile.delete()
                     JarUtils.jar(jarFile, unJar)
                 }
@@ -65,5 +66,9 @@ class JarInject {
 
         c.writeFile(path)
         SeekerTransform.jarClassList.add(c)
+    }
+
+    private static boolean hasMentionedMethod(String className){
+        return false
     }
 }
