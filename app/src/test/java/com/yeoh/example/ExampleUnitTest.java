@@ -1,5 +1,7 @@
 package com.yeoh.example;
 
+import com.yeoh.mock.sub.Caller;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -13,6 +15,6 @@ public class ExampleUnitTest {
 
     @Test
     public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
+        Caller.mock();
     }
 }
