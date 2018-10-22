@@ -8,9 +8,9 @@ import javassist.CtMethod
 import javassist.bytecode.AccessFlag
 import javassist.bytecode.Descriptor
 
-class HideMethodProcessor {
+class MethodModifierProcessor {
 
-    static void processHideMethodClass(CtClass c, String className) {
+    static void process(CtClass c, String className) {
         if (c == null || className == null) {
             return
         }
@@ -29,7 +29,7 @@ class HideMethodProcessor {
         Log.d("======== done")
     }
 
-    static void processTargetMethod(CtClass c, def hideMethod) {
+    private static void processTargetMethod(CtClass c, def hideMethod) {
         Log.d("-------- start to change method: " + hideMethod.toString())
 //        CtClass returns = CtClass.forName(hideMethod.returns)
         CtClass returns = SeekerTransform.pool.getCtClass(hideMethod.returns)

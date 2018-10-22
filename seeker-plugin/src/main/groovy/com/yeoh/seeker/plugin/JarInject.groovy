@@ -40,8 +40,9 @@ class JarInject {
                     && !className.contains('R.class')
                     && !className.contains("BuildConfig.class")) {
                 className = className.substring(0, className.length() - 6)
-//                Log.d("traverseClassList className = " + className)
+
                 DataSource.seekerConfig.keySet().forEach({
+                    // find hide method
                     if (className == it || className.replace("\$", ".") == it) {
                         if (!hasAppend) {
                             hasAppend = true
@@ -49,6 +50,8 @@ class JarInject {
                         }
                         haveTarget = true
                         processClass(it, jarZipDir)
+                    } else if (hasReferencedClass(className, it)) {
+
                     }
                 })
             }
@@ -62,13 +65,24 @@ class JarInject {
             c.defrost()
         }
 
-        HideMethodProcessor.processHideMethodClass(c, className)
+        MethodModifierProcessor.process(c, className)
 
         c.writeFile(path)
         SeekerTransform.jarClassList.add(c)
     }
 
-    private static boolean hasMentionedMethod(String className){
+    private static boolean hasReferencedClass(String className, String targetClass) {
+        CtClass c = SeekerTransform.pool.getCtClass(className)
+        if (c.isFrozen()) {
+            c.defrost()
+        }
+
+        c.refClasses.forEach({
+            if (targetClass == it || targetClass.replace("\$", ".") == it) {
+                Log.d("found reference class :" + className)
+            }
+        })
+
         return false
     }
 }
