@@ -1,11 +1,12 @@
 package com.yeoh.mock.sub;
 
+import android.app.Activity;
 import android.util.Log;
 
 import com.yeoh.mock.MockModel;
 import com.yeoh.mock.MockModel2;
 
-public class Caller {
+public class Caller extends Activity {
 
     private static void callMockModel() {
         MockModel mockModel = new MockModel();

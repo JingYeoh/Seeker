@@ -49,9 +49,9 @@ class JarInject {
                             SeekerTransform.pool.appendClassPath(jarZipDir)
                         }
                         haveTarget = true
-                        processClass(it, jarZipDir)
+                        processMethodModifier(it, jarZipDir)
                     } else if (hasReferencedClass(className, it)) {
-
+                        processReferencedClass(className, it)
                     }
                 })
             }
@@ -59,13 +59,25 @@ class JarInject {
         return haveTarget
     }
 
-    private static void processClass(String className, String path) {
+    private static void processMethodModifier(String className, String path) {
         CtClass c = SeekerTransform.pool.getCtClass(className)
         if (c.isFrozen()) {
             c.defrost()
         }
 
         MethodModifierProcessor.process(c, className)
+
+        c.writeFile(path)
+        SeekerTransform.jarClassList.add(c)
+    }
+
+    private static void processReferencedClass(String className, String path) {
+        CtClass c = SeekerTransform.pool.getCtClass(className)
+        if (c.isFrozen()) {
+            c.defrost()
+        }
+
+        ReferencedClassProcessor.process(c, className)
 
         c.writeFile(path)
         SeekerTransform.jarClassList.add(c)
@@ -79,10 +91,10 @@ class JarInject {
 
         c.refClasses.forEach({
             if (targetClass == it || targetClass.replace("\$", ".") == it) {
-                Log.d("found reference class :" + className)
+                Log.d("found reference class :" + it + " in " + className)
+                return true
             }
         })
-
         return false
     }
 }

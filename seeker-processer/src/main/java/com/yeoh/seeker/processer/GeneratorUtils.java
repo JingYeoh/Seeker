@@ -2,7 +2,7 @@ package com.yeoh.seeker.processer;
 
 class GeneratorUtils {
 
-    public static Class getPrimitiveTypeClass(String className) {
+    static Class getPrimitiveTypeClass(String className) {
         switch (className) {
             case "void":
                 return void.class;
@@ -45,14 +45,14 @@ class GeneratorUtils {
         return null;
     }
 
-    public static String getArrayClassName(String className) {
+    static String getArrayClassName(String className) {
         if (className.trim().endsWith("[]")) {
             return className.substring(0, className.length() - 2);
         }
         return null;
     }
 
-    public static boolean isVoid(String className) {
+    static boolean isVoid(String className) {
         if (className == null || className.length() == 0) {
             return true;
         }

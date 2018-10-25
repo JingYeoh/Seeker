@@ -8,6 +8,11 @@ import javassist.CtMethod
 import javassist.bytecode.AccessFlag
 import javassist.bytecode.Descriptor
 
+/**
+ * 添加 @Hide 注解的方法的生成类.
+ *
+ * 修改方法的 modifier 为指定的 modifier.
+ */
 class MethodModifierProcessor {
 
     static void process(CtClass c, String className) {
