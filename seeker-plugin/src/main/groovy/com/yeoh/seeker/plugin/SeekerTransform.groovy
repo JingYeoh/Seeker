@@ -11,6 +11,7 @@ import org.gradle.api.Project
 
 class SeekerTransform extends Transform {
 
+    static final String GROUP = "SeekerTransform"
     private Project mProject
     static ClassPool pool
     static List<DirectoryInput> classFileList
@@ -46,7 +47,7 @@ class SeekerTransform extends Transform {
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         Collection<TransformInput> inputs = transformInvocation.getInputs()
         TransformOutputProvider outputProvider = transformInvocation.getOutputProvider()
-        Log.d('----------------- Seeker start -----------------')
+        Log.i(1, GROUP, '----------------- Seeker start -----------------')
         readSeekerConfig(inputs)
         pool.appendClassPath(mProject.android.bootClasspath[0].toString())
 
@@ -74,11 +75,12 @@ class SeekerTransform extends Transform {
      */
     private static void readSeekerConfig(Collection<TransformInput> inputs) {
         DataSource.clear()
+        Log.i(2, GROUP, "readSeekerConfig")
         inputs.each { TransformInput input ->
             input.directoryInputs.each { DirectoryInput directoryInput ->
 //                File configFile = new File(directoryInput.file.absolutePath + "/com/yeoh/seeker/seeker.json")
                 File configFile = new File("./build/Seeker/seeker.json")
-                Log.d(configFile.path)
+                Log.i(3, GROUP, configFile.path)
                 if (configFile.exists()) {
                     def content = new StringBuilder()
                     configFile.eachLine("UTF-8") {
