@@ -51,7 +51,7 @@ class JarInject {
                         haveTarget = true
                         processMethodModifier(it, jarZipDir)
                     } else if (hasReferencedClass(className, it)) {
-                        processReferencedClass(className, it)
+                        processReferencedClass(className, it, jarZipDir)
                     }
                 })
             }
@@ -65,36 +65,40 @@ class JarInject {
             c.defrost()
         }
 
-        MethodModifierProcessor.process(c, className)
+        MethodModifierProcessor.process(c)
 
         c.writeFile(path)
         SeekerTransform.jarClassList.add(c)
     }
 
-    private static void processReferencedClass(String className, String path) {
-        CtClass c = SeekerTransform.pool.getCtClass(className)
-        if (c.isFrozen()) {
-            c.defrost()
+    private static void processReferencedClass(String hostClass, String referencedClass, String path) {
+        CtClass host = SeekerTransform.pool.getCtClass(hostClass)
+        if (host.isFrozen()) {
+            host.defrost()
         }
 
-        ReferencedClassProcessor.process(c, className)
+        ReferencedClassProcessor.process(host, referencedClass)
 
-        c.writeFile(path)
-        SeekerTransform.jarClassList.add(c)
+        host.writeFile(path)
+        SeekerTransform.jarClassList.add(host)
     }
 
+    /**
+     * 类中是否包含使用 @Hide 注解的类
+     */
     private static boolean hasReferencedClass(String className, String targetClass) {
         CtClass c = SeekerTransform.pool.getCtClass(className)
         if (c.isFrozen()) {
             c.defrost()
         }
 
-        c.refClasses.forEach({
+        for (int i = 0; i < c.refClasses.size(); i++) {
+            def it = c.refClasses[i]
             if (targetClass == it || targetClass.replace("\$", ".") == it) {
                 Log.d("found reference class :" + it + " in " + className)
                 return true
             }
-        })
+        }
         return false
     }
 }

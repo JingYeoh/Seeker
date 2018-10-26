@@ -15,30 +15,37 @@ import javassist.bytecode.Descriptor
  */
 class MethodModifierProcessor {
 
-    static void process(CtClass c, String className) {
-        if (c == null || className == null) {
+    static final String GROUP = "MethodModifier"
+
+    static void process(CtClass c) {
+        if (c == null) {
             return
         }
+        String className = c.name
         def hideMethod = DataSource.seekerConfig.get(className)
         if (hideMethod == null) {
             return
         }
-        Log.d("======== start to process class :" + className)
-        Log.d("==== hideMethods = " + hideMethod)
+        Log.i(2, GROUP, "begin to process class :" + className)
+        Log.i(3, GROUP, "hideMethods = " + hideMethod)
 
         c.setModifiers(AccessFlag.setPublic(c.getModifiers()))
 
         hideMethod.forEach({
             processTargetMethod(c, it)
         })
-        Log.d("======== done")
+        Log.i(2, GROUP, "done")
     }
 
+    /**
+     * 对添加 @Hide 注解的方法进行处理
+     */
     private static void processTargetMethod(CtClass c, def hideMethod) {
-        Log.d("-------- start to change method: " + hideMethod.toString())
-//        CtClass returns = CtClass.forName(hideMethod.returns)
+        Log.i(3, GROUP, " start to change method: " + hideMethod.toString())
+
         CtClass returns = SeekerTransform.pool.getCtClass(hideMethod.returns)
-        Log.d("returns get success...")
+        Log.i(4, GROUP, "returns get success...")
+
         CtClass[] params = null
         if (hideMethod.params != null) {
             params = new CtClass[hideMethod.params.size()]
@@ -48,7 +55,8 @@ class MethodModifierProcessor {
             }
         }
         String descriptor = Descriptor.ofMethod(returns, params)
-        Log.d("descriptor get success...")
+        Log.i(4, GROUP, "descriptor get success...")
+
         CtMethod ctMethod = c.getMethod(hideMethod.methodName, descriptor)
         if (ctMethod == null) {
             ctMethod = c.getDeclaredMethod(hideMethod.methodName, params)
@@ -57,6 +65,7 @@ class MethodModifierProcessor {
             ThrowExecutionError.throwError(c.name + " not found method:  " + hideMethod.methodName)
         }
         GenerateUtils.changeModifier(ctMethod, hideMethod.modifier)
-        Log.d(c.name + "#" + hideMethod.methodName + " modifier changed to " + hideMethod.modifier)
+
+        Log.i(3, GROUP, c.name + "#" + hideMethod.methodName + " modifier changed to " + hideMethod.modifier)
     }
 }

@@ -1,4 +1,5 @@
 package com.yeoh.seeker.plugin.utils
+
 import java.util.logging.Logger
 
 /**
@@ -18,16 +19,33 @@ class Log {
         }
     }
 
-    static void d_(Object msg) {
+    static void i(int level, String group, Object msg) {
         if (Debug) {
-            print("$TAG: " + msg.toString())
+            def start = new StringBuffer()
+            for (int i = 0; i < getStartSpace(level); i++) {
+                start.append(" ")
+            }
+            for (int i = 0; i < level; i++) {
+                start.append(">")
+            }
+            start.append(" ")
+            start.append(group)
+            start.append(": ")
+            start.append(msg.toString())
+            println(start.toString())
         }
     }
 
-    static void _d(Object msg) {
-        if (Debug) {
-            println("$TAG: " + msg.toString())
+    /**
+     * 返回开始的空格个数
+     */
+    private static int getStartSpace(int level) {
+        int sum = 0
+        for (int i = level - 1; i > 0; i--) {
+            sum += i
+            sum += i - 1
         }
+        return sum
     }
 
     static void error(Object msg) {
