@@ -27,4 +27,7 @@ public class Caller extends Activity {
         callMockModel();
         callMockModel2();
     }
+
+    private void test(String arg0) {
+    }
 }
