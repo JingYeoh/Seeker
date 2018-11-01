@@ -24,6 +24,6 @@ public class SubMockModel {
     }
 
     @Hide(Modifier.PROTECTED)
-    public void subMockTestMethod(int num, String name, Context context) {
+    private void subMockTestMethod(int num, String name, Context context) {
     }
 }

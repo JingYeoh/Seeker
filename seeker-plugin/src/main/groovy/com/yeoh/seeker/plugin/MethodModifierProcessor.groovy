@@ -57,10 +57,11 @@ class MethodModifierProcessor {
         String descriptor = Descriptor.ofMethod(returns, params)
         Log.i(4, GROUP, "descriptor get success...")
 
-        CtMethod ctMethod = c.getMethod(hideMethod.methodName, descriptor)
-        if (ctMethod == null) {
-            ctMethod = c.getDeclaredMethod(hideMethod.methodName, params)
-        }
+//        CtMethod ctMethod = c.getMethod(hideMethod.methodName, descriptor)
+        CtMethod ctMethod = GenerateUtils.getMethod(c, hideMethod.methodName, descriptor)
+//        if (ctMethod == null) {
+//            ctMethod = c.getDeclaredMethod(hideMethod.methodName, params)
+//        }
         if (ctMethod == null) {
             ThrowExecutionError.throwError(c.name + " not found method:  " + hideMethod.methodName)
         }

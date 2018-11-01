@@ -1,15 +1,17 @@
 package com.yeoh.seeker.plugin
 
+import com.yeoh.seeker.plugin.utils.GenerateUtils
 import com.yeoh.seeker.plugin.utils.Log
-import javassist.ClassPool
+import javassist.CannotCompileException
 import javassist.CtClass
-import javassist.bytecode.AttributeInfo
-import javassist.bytecode.Descriptor
+import javassist.CtMethod
+import javassist.bytecode.CodeAttribute
+import javassist.bytecode.LocalVariableAttribute
 import javassist.bytecode.MethodInfo
+import javassist.expr.ExprEditor
+import javassist.expr.MethodCall
 
 import java.lang.reflect.Method
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 /**
  * 用于修改「调用添加 @Hide 注解的方法」的类.
@@ -31,15 +33,15 @@ class ReferencedClassProcessor {
         }
         Log.i(2, GROUP, "start to process referenced class :" + hostClass)
 
-        Class clazz = SeekerTransform.pool.toClass(c)
-        Log.i(3, GROUP, clazz)
-        for (Method it : clazz.methods) {
-            Log.i(3, GROUP, it.toString())
-        }
+//        Class clazz = SeekerTransform.pool.toClass(c)
+//        Log.i(3, GROUP, clazz)
+//        for (Method it : clazz.methods) {
+//            Log.i(3, GROUP, it.toString())
+//        }
 
         // 遍历类中的所有方法，获取方法中涉及到的类，然后和 HideMethod 进行对比
         c.classFile.getMethods().forEach({
-            extractReferencedClassFromMethod(it, hideMethods)
+            extractReferencedClassFromMethod(c, it, hideMethods)
         })
 
         Log.i(2, GROUP, "done")
@@ -48,28 +50,24 @@ class ReferencedClassProcessor {
     /**
      * 从方法中解析出方法涉及到的类
      */
-    private static void extractReferencedClassFromMethod(MethodInfo info, def hideMethods) {
+    private static void extractReferencedClassFromMethod(CtClass ctClass, MethodInfo info,
+                                                         def hideMethods) {
         String methodName = info.name
         // 通过 descriptor　获取方法参数中的类
         String descriptor = info.descriptor
-        Log.i(3, GROUP, "method = " + methodName)
-        String reg = "(L.+?;)"
-        Pattern pattern = Pattern.compile(reg)
-        Matcher matcher = pattern.matcher(descriptor)
-        while (matcher.find()) {
-            String className = matcher.group()
-            className = className.substring(1, className.length() - 1)
-            Log.i(3, GROUP, "found class " + className + " in " + methodName)
-//            className = getClassName(className)
-            findInSeeker(className, methodName, hideMethods)
+        Log.i(3, GROUP, "methodName = " + methodName)
+        CtMethod ctMethod = GenerateUtils.getMethod(ctClass, methodName, descriptor)
+        Log.i(3, GROUP, "method = " + ctMethod)
+
+//        Class clazz = ctClass.toClass()
+        if (ctMethod != null) {
+            ctMethod.instrument(new ExprEditor() {
+                @Override
+                void edit(MethodCall m) throws CannotCompileException {
+                    // todo: 判断是否是 Seeker 的代码,如果是则替换
+                }
+            })
         }
-        //　获取方法 body　中涉及到的类
-        info.constPool.classNames.forEach({
-            Log.i(3, GROUP, "found class by constPool " + it + " in " + methodName)
-        })
-        info.codeAttribute.attributes.forEach({
-            Log.i(3, GROUP, "codeAttributes " + ((AttributeInfo) it).name)
-        })
     }
 
     private static void findInSeeker(String className, String methodName, def hideMethods) {
