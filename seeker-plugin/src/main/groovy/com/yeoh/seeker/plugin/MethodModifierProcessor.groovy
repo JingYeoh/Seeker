@@ -22,16 +22,16 @@ class MethodModifierProcessor {
             return
         }
         String className = c.name
-        def hideMethod = DataSource.seekerConfig.get(className)
-        if (hideMethod == null) {
+        def hideMethods = DataSource.seekerConfig.get(className)
+        if (hideMethods == null) {
             return
         }
         Log.i(2, GROUP, "begin to process class :" + className)
-        Log.i(3, GROUP, "hideMethods = " + hideMethod)
+        Log.i(3, GROUP, "hideMethods = " + hideMethods)
 
         c.setModifiers(AccessFlag.setPublic(c.getModifiers()))
 
-        hideMethod.forEach({
+        hideMethods.forEach({
             processTargetMethod(c, it)
         })
         Log.i(2, GROUP, "done")

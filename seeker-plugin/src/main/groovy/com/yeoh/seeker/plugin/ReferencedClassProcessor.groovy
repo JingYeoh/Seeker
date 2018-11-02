@@ -5,13 +5,9 @@ import com.yeoh.seeker.plugin.utils.Log
 import javassist.CannotCompileException
 import javassist.CtClass
 import javassist.CtMethod
-import javassist.bytecode.CodeAttribute
-import javassist.bytecode.LocalVariableAttribute
 import javassist.bytecode.MethodInfo
 import javassist.expr.ExprEditor
 import javassist.expr.MethodCall
-
-import java.lang.reflect.Method
 
 /**
  * 用于修改「调用添加 @Hide 注解的方法」的类.
@@ -41,7 +37,7 @@ class ReferencedClassProcessor {
 
         // 遍历类中的所有方法，获取方法中涉及到的类，然后和 HideMethod 进行对比
         c.classFile.getMethods().forEach({
-            extractReferencedClassFromMethod(c, it, hideMethods)
+            extractReferencedClassFromMethod(c, referencedClass, it, hideMethods)
         })
 
         Log.i(2, GROUP, "done")
@@ -50,8 +46,8 @@ class ReferencedClassProcessor {
     /**
      * 从方法中解析出方法涉及到的类
      */
-    private static void extractReferencedClassFromMethod(CtClass ctClass, MethodInfo info,
-                                                         def hideMethods) {
+    private static void extractReferencedClassFromMethod(
+            CtClass ctClass, String referencedClassName, MethodInfo info, def hideMethods) {
         String methodName = info.name
         // 通过 descriptor　获取方法参数中的类
         String descriptor = info.descriptor
@@ -59,23 +55,39 @@ class ReferencedClassProcessor {
         CtMethod ctMethod = GenerateUtils.getMethod(ctClass, methodName, descriptor)
         Log.i(3, GROUP, "method = " + ctMethod)
 
-//        Class clazz = ctClass.toClass()
         if (ctMethod != null) {
             ctMethod.instrument(new ExprEditor() {
                 @Override
                 void edit(MethodCall m) throws CannotCompileException {
-                    // todo: 判断是否是 Seeker 的代码,如果是则替换
+                    findInSeeker(m, referencedClassName, hideMethods)
                 }
             })
         }
     }
 
-    private static void findInSeeker(String className, String methodName, def hideMethods) {
+    /**
+     * 在 Seeker 配置中寻找方法是否匹配
+     */
+    private static void findInSeeker(MethodCall m, String referencedClassName, def hideMethods) {
+        if (referencedClassName != m.className ||
+                referencedClassName.replace("\$", ".") != m.className) {
+            return
+        }
+        Log.i(3, GROUP, "findInSeeker start..." + m.className + "#" + m.methodName)
+        Log.i(4, GROUP, "find referenced class " + referencedClassName)
+
+        // freeze referenced class
+        CtClass ctClass = SeekerTransform.pool.getCtClass(referencedClassName)
+        if (ctClass.isFrozen()) {
+            ctClass.defrost()
+        }
+        String descriptor = m.method.getMethodInfo().descriptor
         hideMethods.forEach({
-            if (className == it || className.replace("\$", ".") == it) {
-                Log.d("find referenced class in " + className + "#" + methodName)
+            if (GenerateUtils.equal(m.methodName, descriptor, it)) {
+                Log.i(4, GROUP, "find referenced method " + referencedClassName + "#" + m.methodName)
             }
         })
+        Log.i(3, GROUP, "findInSeeker end...")
     }
 
     private static String getClassName(String className) {
