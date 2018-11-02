@@ -8,6 +8,7 @@ import javassist.CtMethod
 import javassist.bytecode.MethodInfo
 import javassist.expr.ExprEditor
 import javassist.expr.MethodCall
+import javassist.expr.NewExpr
 
 /**
  * 用于修改「调用添加 @Hide 注解的方法」的类.
@@ -61,6 +62,11 @@ class ReferencedClassProcessor {
                 void edit(MethodCall m) throws CannotCompileException {
                     findInSeeker(m, referencedClassName, hideMethods)
                 }
+
+                @Override
+                void edit(NewExpr e) throws CannotCompileException {
+                    super.edit(e)
+                }
             })
         }
     }
@@ -84,10 +90,45 @@ class ReferencedClassProcessor {
         String descriptor = m.method.getMethodInfo().descriptor
         hideMethods.forEach({
             if (GenerateUtils.equal(m.methodName, descriptor, it)) {
-                Log.i(4, GROUP, "find referenced method " + referencedClassName + "#" + m.methodName)
+                Log.i(4, GROUP, "find referenced method: " + it)
+                getRefBarrierBody(referencedClassName, it)
+//                m.replace("{ \$_ = $proceed(\$\$); }")
+                m.replace("{}")
             }
         })
         Log.i(3, GROUP, "findInSeeker end...")
+    }
+
+    /**
+     * 返回需要 replace 的新的 body
+     *
+     * 被替换的表达式为：xx = new xx$$RefBarrier(xx).xxx(..)
+     */
+    private static String getRefBarrierBody(String referencedClassName, def hideMethod) {
+        StringBuilder builder = new StringBuilder()
+        builder.append("{ ")
+        // 又返回值需要加上返回参数
+        if (hideMethod.returns != null && hideMethod.returns.toLowerCase() != "void") {
+            builder.append("\$_ = ")
+            // 强制转换参数
+            builder.append("(\$r)")
+        }
+        builder.append("new ")
+        builder.append(referencedClassName).append("\$\$RefBarrier")
+        builder.append("(")
+        builder.append("\$class")
+        builder.append(")")
+        builder.append(".")
+        builder.append(hideMethod.methodName)
+        if (hideMethod.params == null) {
+            builder.append("();")
+        } else {
+            builder.append("(\$\$);")
+        }
+        builder.append(" }")
+
+        Log.i(6, GROUP, builder.toString())
+        return builder.toString()
     }
 
     private static String getClassName(String className) {

@@ -86,7 +86,6 @@ class GenerateUtils {
         if (methodName == null || hideMethod == null) {
             return false
         }
-        Log.i(6, GROUP, descriptor)
         // 获取参数
         String reg = "(L.+?;)".intern()
         Pattern pattern = Pattern.compile(reg)
@@ -95,13 +94,17 @@ class GenerateUtils {
         while (matcher.find()) {
             String className = matcher.group()
             className = className.substring(1, className.length() - 1)
+            className.replace("/", ".")
             paramsClasses.add(className)
-            Log.i(6, GROUP, className)
         }
-        if (paramsClasses.isEmpty() && (hideMethod.params == null || hideMethod.params.isEmpty())) {
+        if (paramsClasses.isEmpty() && hideMethod.params == null) {
             return true
+        } else if (hideMethod.params == null) {
+            return false
+        } else if (!paramsClasses.isEmpty()) {
+            return false
         }
-        if (paramsClasses.size() != hideMethod.params.length) {
+        if (paramsClasses.size() != hideMethod.params.size()) {
             return false
         }
         for (int i = 0; i < paramsClasses.size(); i++) {
