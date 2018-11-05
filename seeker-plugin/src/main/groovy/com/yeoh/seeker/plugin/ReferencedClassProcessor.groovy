@@ -61,11 +61,11 @@ class ReferencedClassProcessor {
             ctMethod.instrument(new ExprEditor() {
                 @Override
                 void edit(MethodCall m) throws CannotCompileException {
-                    try {
+//                    try {
                         findInSeeker(m, referencedClassName, hideMethods)
-                    } catch (NullPointerException e) {
-                        e.printStackTrace()
-                    }
+//                    } catch (NullPointerException e) {
+//                        e.printStackTrace()
+//                    }
                 }
 
                 @Override
@@ -100,16 +100,6 @@ class ReferencedClassProcessor {
                 String refBarrierBody = getRefBarrierBody(referencedClassName, it)
                 Log.i(6, GROUP, refBarrierBody)
                 m.replace(refBarrierBody)
-//                m.replace("{ \$_ = $proceed(\$\$); }")
-//                m.replace("{}")
-//                m.replace("{ " +
-//                        "long stime = System.currentTimeMillis(); \$_ = \$proceed(\$\$);System.out.println(\""
-//                        + m.getClassName() + "." + m.getMethodName()
-//                        + " cost:\" + (System.currentTimeMillis() - stime) + \" ms\");}")
-//                m.replace("{ " +
-//                        "long stime = System.currentTimeMillis(); System.out.println(\""
-//                        + m.getClassName() + "." + m.getMethodName()
-//                        + " cost:\" + (System.currentTimeMillis() - stime) + \" ms\");}")
             }
         })
         Log.i(3, GROUP, "findInSeeker end...")
