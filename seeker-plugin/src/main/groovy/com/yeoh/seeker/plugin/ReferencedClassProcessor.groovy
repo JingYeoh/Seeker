@@ -2,6 +2,7 @@ package com.yeoh.seeker.plugin
 
 import com.yeoh.seeker.plugin.utils.GenerateUtils
 import com.yeoh.seeker.plugin.utils.Log
+import com.yeoh.seeker.plugin.utils.ThrowExecutionError
 import javassist.CannotCompileException
 import javassist.CtClass
 import javassist.CtMethod
@@ -60,7 +61,11 @@ class ReferencedClassProcessor {
             ctMethod.instrument(new ExprEditor() {
                 @Override
                 void edit(MethodCall m) throws CannotCompileException {
-                    findInSeeker(m, referencedClassName, hideMethods)
+                    try {
+                        findInSeeker(m, referencedClassName, hideMethods)
+                    } catch (NullPointerException e) {
+                        e.printStackTrace()
+                    }
                 }
 
                 @Override
@@ -74,7 +79,8 @@ class ReferencedClassProcessor {
     /**
      * 在 Seeker 配置中寻找方法是否匹配
      */
-    private static void findInSeeker(MethodCall m, String referencedClassName, def hideMethods) {
+    private static void findInSeeker(MethodCall m, String referencedClassName, def hideMethods)
+            throws NullPointerException {
         if (referencedClassName != m.className ||
                 referencedClassName.replace("\$", ".") != m.className) {
             return
@@ -90,10 +96,20 @@ class ReferencedClassProcessor {
         String descriptor = m.method.getMethodInfo().descriptor
         hideMethods.forEach({
             if (GenerateUtils.equal(m.methodName, descriptor, it)) {
-                Log.i(4, GROUP, "find referenced method: " + it)
-                getRefBarrierBody(referencedClassName, it)
+//                Log.i(4, GROUP, "find referenced method: " + it)
+                String refBarrierBody = getRefBarrierBody(referencedClassName, it)
+                Log.i(6, GROUP, refBarrierBody)
+                m.replace(refBarrierBody)
 //                m.replace("{ \$_ = $proceed(\$\$); }")
-                m.replace("{}")
+//                m.replace("{}")
+//                m.replace("{ " +
+//                        "long stime = System.currentTimeMillis(); \$_ = \$proceed(\$\$);System.out.println(\""
+//                        + m.getClassName() + "." + m.getMethodName()
+//                        + " cost:\" + (System.currentTimeMillis() - stime) + \" ms\");}")
+//                m.replace("{ " +
+//                        "long stime = System.currentTimeMillis(); System.out.println(\""
+//                        + m.getClassName() + "." + m.getMethodName()
+//                        + " cost:\" + (System.currentTimeMillis() - stime) + \" ms\");}")
             }
         })
         Log.i(3, GROUP, "findInSeeker end...")
@@ -126,7 +142,6 @@ class ReferencedClassProcessor {
             builder.append("(\$\$);")
         }
         builder.append(" }")
-
         Log.i(6, GROUP, builder.toString())
         return builder.toString()
     }
