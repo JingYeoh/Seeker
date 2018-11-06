@@ -20,44 +20,88 @@ class ReferencedClassProcessor {
     static final String REFDELEGATE_PREFIX = "_"
     static final String GROUP = "ReferencedClass"
 
-    static void process(CtClass c, String referencedClass) {
+    /**
+     * 处理调用被 @Hide 注解标记的方法的类
+     * @param className 要处理的类
+     * @param targetClass 含有 @Hide 注解的类
+     */
+    static void process(String className, String referencedClass, String jarZipDir) {
+        CtClass c = SeekerTransform.pool.getCtClass(className)
+        if (c.isFrozen()) {
+            c.defrost()
+        }
+
+        for (int i = 0; i < c.refClasses.size(); i++) {
+            def it = c.refClasses[i]
+            // 判断类是否已经被处理过
+            if (GenerateUtils.isClassEqual(it, generateRefDelegateClassName(referencedClass))) {
+                Log.i(2, GROUP, "class " + className + " has been proceed")
+                return
+            }
+        }
+        // 判断类中是否含有被 @Hide 标记的类
+        for (int i = 0; i < c.refClasses.size(); i++) {
+            def it = c.refClasses[i]
+            if (GenerateUtils.isClassEqual(referencedClass, it)) {
+                startProcess(className, it, jarZipDir)
+            }
+        }
+    }
+
+    /**
+     * 开始处理
+     * @param hostClass 要处理的类
+     * @param referencedClass 含有 @Hide 注解的类
+     * @param path jar 包路径
+     */
+    private static void startProcess(String hostClass, String referencedClass, String path) {
+        Log.i(2, GROUP, "start process " + hostClass)
+        CtClass host = SeekerTransform.pool.getCtClass(hostClass)
+        if (host.isFrozen()) {
+            host.defrost()
+        }
+
+        doProcess(host, referencedClass)
+
+        host.writeFile(path)
+        SeekerTransform.jarClassList.add(host)
+        Log.i(2, GROUP, "process end ...")
+        Log.ln(2, GROUP)
+    }
+
+    /**
+     * 处理过程
+     * @param c 要处理的类 CtClass 对象
+     * @param referencedClass 含有 @Hide 注解的类
+     */
+    private static void doProcess(CtClass c, String referencedClass) {
         if (c == null) {
             return
         }
         String hostClass = c.name
-        def hideMethods = DataSource.seekerConfig.get(referencedClass)
-        if (hideMethods == null) {
-            return
-        }
-        Log.i(2, GROUP, "start to process referenced class :" + hostClass)
-
-//        Class clazz = SeekerTransform.pool.toClass(c)
-//        Log.i(3, GROUP, clazz)
-//        for (Method it : clazz.methods) {
-//            Log.i(3, GROUP, it.toString())
-//        }
+        Log.i(3, GROUP, "start to process referenced class :" + hostClass)
 
         // 遍历类中的所有方法，获取方法中涉及到的类，然后和 HideMethod 进行对比
         c.classFile.getMethods().forEach({
-            extractReferencedClassFromMethod(c, referencedClass, it, hideMethods)
+            extractReferencedClassFromMethod(c, referencedClass, it)
         })
 
-        Log.i(2, GROUP, "done")
+        Log.i(3, GROUP, "done")
+        Log.ln(3, GROUP)
     }
 
     /**
      * 从方法中解析出方法涉及到的类
      */
-    private static void extractReferencedClassFromMethod(
-            CtClass ctClass, String referencedClassName, MethodInfo info, def hideMethods) {
+    private static void extractReferencedClassFromMethod(CtClass ctClass, String referencedClassName, MethodInfo info) {
         String methodName = info.name
         // 通过 descriptor　获取方法参数中的类
         String descriptor = info.descriptor
-        Log.i(3, GROUP, "methodName = " + methodName)
+        Log.i(4, GROUP, "methodName = " + methodName)
         CtMethod ctMethod = GenerateUtils.getMethod(ctClass, methodName, descriptor)
-        Log.i(3, GROUP, "method = " + ctMethod)
+        Log.i(4, GROUP, "method = " + ctMethod)
 
-        Log.i(3, GROUP, "findInSeeker start...")
+        Log.i(4, GROUP, "findInSeeker start...")
         if (ctMethod != null) {
             ctMethod.instrument(new ExprEditor() {
                 @Override
@@ -66,8 +110,8 @@ class ReferencedClassProcessor {
                 }
             })
         }
-        Log.i(3, GROUP, "findInSeeker end...")
-        Log.ln(3, GROUP)
+        Log.i(4, GROUP, "findInSeeker end...")
+        Log.ln(4, GROUP)
     }
 
     /**
@@ -78,11 +122,10 @@ class ReferencedClassProcessor {
                 referencedClassName.replace("\$", ".") != e.className) {
             return
         }
-        Log.i(4, GROUP, "find referenced class: " + e.className)
-//        String replaceBody = "{ " + "\$_ = new " + generateRefDelegateClassName(referencedClassName) + "(\$proceed(\$\$)); " + "}"
+        Log.i(5, GROUP, "find referenced class: " + e.className)
         String replaceBody = "{ " + "\$_ = new " + generateRefDelegateClassName(referencedClassName) + "(\$proceed(\$\$)); " + "}"
 
-        Log.i(4, GROUP, replaceBody)
+        Log.i(5, GROUP, replaceBody)
         e.replace(replaceBody)
     }
 

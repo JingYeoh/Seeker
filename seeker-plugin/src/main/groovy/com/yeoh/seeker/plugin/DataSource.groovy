@@ -9,6 +9,7 @@ package com.yeoh.seeker.plugin
 class DataSource {
 
     def static seekerConfig = [:]
+    def static processed = [:]
 
     def static clear() {
         seekerConfig = [:]

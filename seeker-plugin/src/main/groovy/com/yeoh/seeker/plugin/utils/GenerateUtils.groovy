@@ -73,6 +73,31 @@ class GenerateUtils {
     }
 
     /**
+     * 两个类是否相同
+     * @param class0 类1
+     * @param class1 类2
+     * @return 是否相等
+     */
+    static boolean isClassEqual(String class0, String class1) {
+        if (class0 == null || class1 == null) {
+            return false
+        }
+        if (class0 == class1) {
+            return true
+        }
+        if (class0 == class1.replace("\$", ".")) {
+            return true
+        }
+        if (class1 == class0.replace("\$", ".")) {
+            return true
+        }
+        if (class0.replace("\$", ".") == class1.replace("\$", ".")) {
+            return true
+        }
+        return false
+    }
+
+    /**
      * 判断两个方法是否相等
      * @param methodName 方法名称
      * @param descriptor 方法 descriptor
