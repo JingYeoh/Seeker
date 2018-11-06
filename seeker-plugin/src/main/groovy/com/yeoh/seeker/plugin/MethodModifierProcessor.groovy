@@ -6,7 +6,6 @@ import com.yeoh.seeker.plugin.utils.ThrowExecutionError
 import javassist.CtClass
 import javassist.CtMethod
 import javassist.bytecode.AccessFlag
-import javassist.bytecode.AnnotationsAttribute
 import javassist.bytecode.Descriptor
 
 /**
@@ -70,11 +69,5 @@ class MethodModifierProcessor {
         GenerateUtils.changeModifier(ctMethod, hideMethod.modifier)
         Log.i(3, GROUP, c.name + "#" + hideMethod.methodName + " modifier changed to " + hideMethod.modifier)
         // 删除 @Hide Annotation
-        AnnotationsAttribute attr = new AnnotationsAttribute(SeekerTransform.pool, AnnotationsAttribute.visibleTag);
-        ctMethod.methodInfo.attributes.forEach({
-            if (it instanceof AnnotationsAttribute) {
-                AnnotationsAttribute aa = it
-            }
-        })
     }
 }

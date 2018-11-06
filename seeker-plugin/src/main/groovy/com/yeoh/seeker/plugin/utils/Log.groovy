@@ -36,6 +36,22 @@ class Log {
         }
     }
 
+    static void ln(int level, String group) {
+        if (Debug) {
+            def start = new StringBuffer()
+            for (int i = 0; i < getStartSpace(level); i++) {
+                start.append(" ")
+            }
+            for (int i = 0; i < level; i++) {
+                start.append(">")
+            }
+            start.append(" ")
+            start.append(group)
+            start.append(": ----------")
+            println(start.toString())
+        }
+    }
+
     /**
      * 返回开始的空格个数
      */

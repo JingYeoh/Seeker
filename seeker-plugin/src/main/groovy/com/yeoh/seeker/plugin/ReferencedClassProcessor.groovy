@@ -2,13 +2,11 @@ package com.yeoh.seeker.plugin
 
 import com.yeoh.seeker.plugin.utils.GenerateUtils
 import com.yeoh.seeker.plugin.utils.Log
-import com.yeoh.seeker.plugin.utils.ThrowExecutionError
 import javassist.CannotCompileException
 import javassist.CtClass
 import javassist.CtMethod
 import javassist.bytecode.MethodInfo
 import javassist.expr.ExprEditor
-import javassist.expr.MethodCall
 import javassist.expr.NewExpr
 
 /**
@@ -18,6 +16,8 @@ import javassist.expr.NewExpr
  */
 class ReferencedClassProcessor {
 
+    static final String REFDELEGATE_SUFFIX = "RefDelegate"
+    static final String REFDELEGATE_PREFIX = "_"
     static final String GROUP = "ReferencedClass"
 
     static void process(CtClass c, String referencedClass) {
@@ -57,86 +57,43 @@ class ReferencedClassProcessor {
         CtMethod ctMethod = GenerateUtils.getMethod(ctClass, methodName, descriptor)
         Log.i(3, GROUP, "method = " + ctMethod)
 
+        Log.i(3, GROUP, "findInSeeker start...")
         if (ctMethod != null) {
             ctMethod.instrument(new ExprEditor() {
                 @Override
-                void edit(MethodCall m) throws CannotCompileException {
-//                    try {
-                        findInSeeker(m, referencedClassName, hideMethods)
-//                    } catch (NullPointerException e) {
-//                        e.printStackTrace()
-//                    }
-                }
-
-                @Override
                 void edit(NewExpr e) throws CannotCompileException {
-                    super.edit(e)
+                    findInSeeker(e, referencedClassName)
                 }
             })
         }
+        Log.i(3, GROUP, "findInSeeker end...")
+        Log.ln(3, GROUP)
     }
 
     /**
-     * 在 Seeker 配置中寻找方法是否匹配
+     * 在 Seeker 中寻找是否有匹配的类
      */
-    private static void findInSeeker(MethodCall m, String referencedClassName, def hideMethods)
-            throws NullPointerException {
-        if (referencedClassName != m.className ||
-                referencedClassName.replace("\$", ".") != m.className) {
+    private static void findInSeeker(NewExpr e, String referencedClassName) {
+        if (referencedClassName != e.className ||
+                referencedClassName.replace("\$", ".") != e.className) {
             return
         }
-        Log.i(3, GROUP, "findInSeeker start..." + m.className + "#" + m.methodName)
-        Log.i(4, GROUP, "find referenced class " + referencedClassName)
+        Log.i(4, GROUP, "find referenced class: " + e.className)
+//        String replaceBody = "{ " + "\$_ = new " + generateRefDelegateClassName(referencedClassName) + "(\$proceed(\$\$)); " + "}"
+        String replaceBody = "{ " + "\$_ = new " + generateRefDelegateClassName(referencedClassName) + "(\$proceed(\$\$)); " + "}"
 
-        // freeze referenced class
-        CtClass ctClass = SeekerTransform.pool.getCtClass(referencedClassName)
-        if (ctClass.isFrozen()) {
-            ctClass.defrost()
-        }
-        String descriptor = m.method.getMethodInfo().descriptor
-        hideMethods.forEach({
-            if (GenerateUtils.equal(m.methodName, descriptor, it)) {
-//                Log.i(4, GROUP, "find referenced method: " + it)
-                String refBarrierBody = getRefBarrierBody(referencedClassName, it)
-                Log.i(6, GROUP, refBarrierBody)
-                m.replace(refBarrierBody)
-            }
-        })
-        Log.i(3, GROUP, "findInSeeker end...")
+        Log.i(4, GROUP, replaceBody)
+        e.replace(replaceBody)
     }
 
     /**
-     * 返回需要 replace 的新的 body
-     *
-     * 被替换的表达式为：xx = new xx$$RefBarrier(xx).xxx(..)
+     * 生成反射代理类的完整名称
+     * @param classFullName 包含报包名的类名
      */
-    private static String getRefBarrierBody(String referencedClassName, def hideMethod) {
-        StringBuilder builder = new StringBuilder()
-        builder.append("{ ")
-        // 又返回值需要加上返回参数
-        if (hideMethod.returns != null && hideMethod.returns.toLowerCase() != "void") {
-            builder.append("\$_ = ")
-            // 强制转换参数
-            builder.append("(\$r)")
-        }
-        builder.append("new ")
-        builder.append(referencedClassName).append("\$\$RefBarrier")
-        builder.append("(")
-        builder.append("\$class")
-        builder.append(")")
-        builder.append(".")
-        builder.append(hideMethod.methodName)
-        if (hideMethod.params == null) {
-            builder.append("();")
-        } else {
-            builder.append("(\$\$);")
-        }
-        builder.append(" }")
-        Log.i(6, GROUP, builder.toString())
-        return builder.toString()
-    }
-
-    private static String getClassName(String className) {
-        return className.replaceAll("/", ".")
+    private static String generateRefDelegateClassName(String classFullName) {
+        String[] splitStr = classFullName.split("\\.")
+        String className = splitStr[splitStr.length - 1]
+        String packageName = classFullName.substring(0, classFullName.length() - className.length() - 1)
+        return packageName + "." + REFDELEGATE_PREFIX + className + REFDELEGATE_SUFFIX
     }
 }

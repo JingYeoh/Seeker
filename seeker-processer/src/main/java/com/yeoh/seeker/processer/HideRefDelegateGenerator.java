@@ -20,16 +20,17 @@ import javax.lang.model.element.Modifier;
  * @author yangjing .
  * @since 2018-09-21
  */
-class HideRefBarrierGenerator {
+class HideRefDelegateGenerator {
 
     private static final String PACKAGE = "com.yeoh.seeker";
-    private static final String SUFFIX = "$$RefBarrier";
+    private static final String SUFFIX = "RefDelegate";
+    private static final String PREFIX = "_";
     private static final String NAME_ARG = "arg";
     private static final String HIDE_REF_BARRIER = HideRefBarrier.class.getSimpleName();
     private Map<String, List<HideMethod>> mHideMethodMap;
     private Filer mFiler;
 
-    HideRefBarrierGenerator(Filer filer, Map<String, List<HideMethod>> hideMethodMap) {
+    HideRefDelegateGenerator(Filer filer, Map<String, List<HideMethod>> hideMethodMap) {
         mFiler = filer;
         mHideMethodMap = hideMethodMap;
     }
@@ -51,9 +52,9 @@ class HideRefBarrierGenerator {
         String className = splitStr[splitStr.length - 1];
         String packageName = classFullName.substring(0, classFullName.length() - className.length() - 1);
 
-        Log.second("--------- generate class " + className + SUFFIX + " start ...");
+        Log.second("--------- generate class " + generateRefBarrierClassName(className) + " start ...");
 
-        TypeSpec.Builder moduleBuilder = TypeSpec.classBuilder(className + SUFFIX)
+        TypeSpec.Builder moduleBuilder = TypeSpec.classBuilder(generateRefBarrierClassName(className))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
         moduleBuilder.superclass(ClassName.bestGuess(PACKAGE + "." + HIDE_REF_BARRIER));
         MethodSpec constructor = MethodSpec.constructorBuilder()
@@ -180,5 +181,12 @@ class HideRefBarrierGenerator {
             }
         }
         Log.second("----- append method returns end ...");
+    }
+
+    /**
+     * 生成反射代理类的类名
+     */
+    private String generateRefBarrierClassName(String className) {
+        return PREFIX + className + SUFFIX;
     }
 }
