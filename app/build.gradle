@@ -33,7 +33,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation ext.dependencies.appcompatV7
     implementation ext.dependencies.constraintLayout
     testImplementation ext.dependencies.junit
@@ -41,7 +41,12 @@ dependencies {
     androidTestImplementation ext.dependencies.testEspressoXore
 
     implementation project(':seeker')
-    implementation project(':mock-lib-sub')
-    implementation project(':mock-lib')
-    annotationProcessor project(':seeker-processer')
+//    implementation project(':mock-lib-sub')
+//    implementation project(':mock-lib')
+//    annotationProcessor project(':seeker-processer')
+
+//    implementation "com.yeoh.seeker:seeker:0.0.1"
+//    implementation "com.yeoh.mock:mock-lib:0.0.1"
+//    implementation "com.yeoh.mock:mock-lib-sub:0.0.1"
+    annotationProcessor "com.yeoh.seeker:seeker-processer:0.0.1"
 }

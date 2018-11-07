@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
 
 def ext = rootProject.ext
 
@@ -34,4 +35,15 @@ dependencies {
 
     implementation project(':seeker')
     annotationProcessor project(':seeker-processer')
+}
+
+group = 'com.yeoh.mock'
+version = '0.0.1'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+        }
+    }
 }
