@@ -49,7 +49,7 @@ public class HideRefBarrier {
     }
 
     @Nullable
-    protected Class[] getParams(HideMethod hideMethod) throws ClassNotFoundException {
+    private Class[] getParams(HideMethod hideMethod) throws ClassNotFoundException {
         Class<?>[] params = null;
         if (hideMethod.params != null && hideMethod.params.length > 0) {
             params = new Class[hideMethod.params.length];

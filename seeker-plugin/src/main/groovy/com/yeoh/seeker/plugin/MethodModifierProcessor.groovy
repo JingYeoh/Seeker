@@ -17,7 +17,43 @@ class MethodModifierProcessor {
 
     static final String GROUP = "MethodModifier"
 
-    static void process(CtClass c) {
+    /**
+     * 处理方法的 modifier
+     * @param className 要处理的类
+     * @param modifierClass 含有 @Hide 注解的类
+     * @param jarZipDir jar 的路径
+     * @return 是否处理
+     */
+    static boolean process(String className, String modifierClass, String jarZipDir) {
+        boolean hasTarget = false
+        if (GenerateUtils.isClassEqual(className, modifierClass)) {
+            startProcess(className, jarZipDir)
+            hasTarget = true
+        }
+        return hasTarget
+    }
+    /**
+     * 开始处理，含有字节码的重新写入
+     * @param className 要处理的类
+     * @param jarZipDir jar 的路径
+     */
+    private static void startProcess(String className, String jarZipDir) {
+        SeekerTransform.pool.appendClassPath(jarZipDir)
+        CtClass c = SeekerTransform.pool.getCtClass(className)
+        if (c.isFrozen()) {
+            c.defrost()
+        }
+
+        doProcess(c)
+
+        c.writeFile(jarZipDir)
+        SeekerTransform.jarClassList.add(c)
+    }
+    /**
+     * 处理字节码
+     * @param c 要处理的类
+     */
+    private static void doProcess(CtClass c) {
         if (c == null) {
             return
         }
@@ -57,17 +93,13 @@ class MethodModifierProcessor {
         String descriptor = Descriptor.ofMethod(returns, params)
         Log.i(4, GROUP, "descriptor get success...")
 
-//        CtMethod ctMethod = c.getMethod(hideMethod.methodName, descriptor)
         CtMethod ctMethod = GenerateUtils.getMethod(c, hideMethod.methodName, descriptor)
-//        if (ctMethod == null) {
-//            ctMethod = c.getDeclaredMethod(hideMethod.methodName, params)
-//        }
         if (ctMethod == null) {
             ThrowExecutionError.throwError(c.name + " not found method:  " + hideMethod.methodName)
         }
         // 改变 modifier 的值
         GenerateUtils.changeModifier(ctMethod, hideMethod.modifier)
         Log.i(3, GROUP, c.name + "#" + hideMethod.methodName + " modifier changed to " + hideMethod.modifier)
-        // 删除 @Hide Annotation
+        // TODO: 删除 @Hide Annotation
     }
 }

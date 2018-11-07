@@ -25,10 +25,10 @@ class ReferencedClassProcessor {
      * @param className 要处理的类
      * @param targetClass 含有 @Hide 注解的类
      */
-    static void process(String className, String referencedClass, String jarZipDir) {
+    static boolean process(String className, String referencedClass, String jarZipDir) {
         // 如果处理的类就是「反射缓存类」，则忽略
         if (GenerateUtils.isClassEqual(className, generateRefDelegateClassName(referencedClass))) {
-            return
+            return false
         }
         CtClass c = SeekerTransform.pool.getCtClass(className)
         if (c.isFrozen()) {
@@ -41,16 +41,19 @@ class ReferencedClassProcessor {
             if (GenerateUtils.isClassEqual(it, generateRefDelegateClassName(referencedClass))) {
                 Log.i(2, GROUP, "class " + className + " has been proceed")
                 startProcess(className, it, jarZipDir, false)
-                return
+                return false
             }
         }
+        boolean hasTarget = false
         // 判断类中是否含有被 @Hide 标记的类
         for (int i = 0; i < c.refClasses.size(); i++) {
             def it = c.refClasses[i]
             if (GenerateUtils.isClassEqual(referencedClass, it)) {
                 startProcess(className, it, jarZipDir, true)
+                hasTarget = true
             }
         }
+        return hasTarget
     }
 
     /**
