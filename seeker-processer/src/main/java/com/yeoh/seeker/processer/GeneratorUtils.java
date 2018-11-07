@@ -25,10 +25,6 @@ class GeneratorUtils {
             case "java.lang.Object":
                 return Object.class;
         }
-//        Class<?>[] classes = getClasses(className);
-//        if (classes != null) {
-//            return classes.getClass();
-//        }
         return null;
     }
 

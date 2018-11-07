@@ -16,8 +16,8 @@ import javassist.expr.NewExpr
  */
 class ReferencedClassProcessor {
 
-    static final String REFDELEGATE_SUFFIX = "RefDelegate"
-    static final String REFDELEGATE_PREFIX = "_"
+    static final String REF_DELEGATE_SUFFIX = "RefDelegate"
+    static final String REF_DELEGATE_PREFIX = "_"
     static final String GROUP = "ReferencedClass"
 
     /**
@@ -26,6 +26,10 @@ class ReferencedClassProcessor {
      * @param targetClass 含有 @Hide 注解的类
      */
     static void process(String className, String referencedClass, String jarZipDir) {
+        // 如果处理的类就是「反射缓存类」，则忽略
+        if (GenerateUtils.isClassEqual(className, generateRefDelegateClassName(referencedClass))) {
+            return
+        }
         CtClass c = SeekerTransform.pool.getCtClass(className)
         if (c.isFrozen()) {
             c.defrost()
@@ -36,6 +40,7 @@ class ReferencedClassProcessor {
             // 判断类是否已经被处理过
             if (GenerateUtils.isClassEqual(it, generateRefDelegateClassName(referencedClass))) {
                 Log.i(2, GROUP, "class " + className + " has been proceed")
+                startProcess(className, it, jarZipDir, false)
                 return
             }
         }
@@ -43,7 +48,7 @@ class ReferencedClassProcessor {
         for (int i = 0; i < c.refClasses.size(); i++) {
             def it = c.refClasses[i]
             if (GenerateUtils.isClassEqual(referencedClass, it)) {
-                startProcess(className, it, jarZipDir)
+                startProcess(className, it, jarZipDir, true)
             }
         }
     }
@@ -53,16 +58,17 @@ class ReferencedClassProcessor {
      * @param hostClass 要处理的类
      * @param referencedClass 含有 @Hide 注解的类
      * @param path jar 包路径
+     * @param process 是否对方法进行处理，必须要进行 jar 打包过程，否则已经替换过的会不生效
      */
-    private static void startProcess(String hostClass, String referencedClass, String path) {
+    private static void startProcess(String hostClass, String referencedClass, String path, boolean process) {
         Log.i(2, GROUP, "start process " + hostClass)
         CtClass host = SeekerTransform.pool.getCtClass(hostClass)
         if (host.isFrozen()) {
             host.defrost()
         }
-
-        doProcess(host, referencedClass)
-
+        if (process) {
+            doProcess(host, referencedClass)
+        }
         host.writeFile(path)
         SeekerTransform.jarClassList.add(host)
         Log.i(2, GROUP, "process end ...")
@@ -92,6 +98,9 @@ class ReferencedClassProcessor {
 
     /**
      * 从方法中解析出方法涉及到的类
+     * @param c 要处理的类 CtClass 对象
+     * @param referencedClassName 含有 @Hide 注解的类名
+     * @orram info 方法的信息
      */
     private static void extractReferencedClassFromMethod(CtClass ctClass, String referencedClassName, MethodInfo info) {
         String methodName = info.name
@@ -116,6 +125,8 @@ class ReferencedClassProcessor {
 
     /**
      * 在 Seeker 中寻找是否有匹配的类
+     * @param e 方法中创建新对象的代码，在此处进行替换为反射代理类
+     * @param referencedClassName 含有 @Hide 注解的类名
      */
     private static void findInSeeker(NewExpr e, String referencedClassName) {
         if (referencedClassName != e.className ||
@@ -137,6 +148,6 @@ class ReferencedClassProcessor {
         String[] splitStr = classFullName.split("\\.")
         String className = splitStr[splitStr.length - 1]
         String packageName = classFullName.substring(0, classFullName.length() - className.length() - 1)
-        return packageName + "." + REFDELEGATE_PREFIX + className + REFDELEGATE_SUFFIX
+        return packageName + "." + REF_DELEGATE_PREFIX + className + REF_DELEGATE_SUFFIX
     }
 }

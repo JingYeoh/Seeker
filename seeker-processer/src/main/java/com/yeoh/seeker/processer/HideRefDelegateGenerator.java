@@ -57,13 +57,13 @@ class HideRefDelegateGenerator {
         TypeSpec.Builder moduleBuilder = TypeSpec.classBuilder(generateRefBarrierClassName(className))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
         moduleBuilder.superclass(ClassName.bestGuess(PACKAGE + "." + HIDE_REF_BARRIER));
-        MethodSpec constructor = MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PUBLIC)
-                .addParameter(Object.class, "object")
-                .addStatement("super(object)")
-                .build();
-        moduleBuilder.addMethod(constructor);
-
+        // 添加构造方法
+        Builder constructorBuilder = MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PUBLIC);
+        appendMethodParams(constructorBuilder, classFullName);
+        constructorBuilder.addStatement("super(" + NAME_ARG + "0)");
+        moduleBuilder.addMethod(constructorBuilder.build());
+        // 添加方法体
         for (HideMethod hideMethod: hideMethods) {
             Log.second("----- start to generate method");
             Log.i(hideMethod.toString());
@@ -122,7 +122,13 @@ class HideRefDelegateGenerator {
         return builder.toString();
     }
 
-    private void appendMethodParams(Builder methodBuilder, String[] params) {
+    /**
+     * 给方法添加参数
+     *
+     * @param methodBuilder 生成方法的 Builder
+     * @param params        方法的的参数
+     */
+    private void appendMethodParams(Builder methodBuilder, String... params) {
         Log.second("----- append method params start ...");
         if (params == null || params.length == 0) {
             return;
@@ -153,6 +159,12 @@ class HideRefDelegateGenerator {
         Log.second("----- append method params end ...");
     }
 
+    /**
+     * 给方法添加返回值
+     *
+     * @param methodBuilder 方法 Builder
+     * @param returns       返回值类型的字符串
+     */
     private void appendMethodReturns(Builder methodBuilder, String returns) {
         Log.second("----- append method returns start ...");
         if (returns == null || returns.length() == 0) {
