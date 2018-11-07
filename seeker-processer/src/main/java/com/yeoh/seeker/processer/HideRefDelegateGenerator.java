@@ -7,7 +7,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.MethodSpec.Builder;
 import com.squareup.javapoet.TypeSpec;
 import com.yeoh.seeker.HideMethod;
-import com.yeoh.seeker.HideRefBarrier;
+import com.yeoh.seeker.HideRefDelegate;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,7 @@ class HideRefDelegateGenerator {
     private static final String SUFFIX = "RefDelegate";
     private static final String PREFIX = "_";
     private static final String NAME_ARG = "arg";
-    private static final String HIDE_REF_BARRIER = HideRefBarrier.class.getSimpleName();
+    private static final String HIDE_REF_DELEGATE = HideRefDelegate.class.getSimpleName();
     private Map<String, List<HideMethod>> mHideMethodMap;
     private Filer mFiler;
 
@@ -40,11 +40,11 @@ class HideRefDelegateGenerator {
             Log.w("hideMethodMap is empty...");
             return;
         }
-        Log.title("========== Generate HideRefBarrier start ==========");
+        Log.title("========== Generate HideRefDelegate start ==========");
         for (String className: mHideMethodMap.keySet()) {
             generateHideRefBarrier(className, mHideMethodMap.get(className));
         }
-        Log.title("========== Generate HideRefBarrier end ==========");
+        Log.title("========== Generate HideRefDelegate end ==========");
     }
 
     private void generateHideRefBarrier(String classFullName, List<HideMethod> hideMethods) throws IOException {
@@ -56,7 +56,7 @@ class HideRefDelegateGenerator {
 
         TypeSpec.Builder moduleBuilder = TypeSpec.classBuilder(generateRefBarrierClassName(className))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
-        moduleBuilder.superclass(ClassName.bestGuess(PACKAGE + "." + HIDE_REF_BARRIER));
+        moduleBuilder.superclass(ClassName.bestGuess(PACKAGE + "." + HIDE_REF_DELEGATE));
         // 添加构造方法
         Builder constructorBuilder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC);

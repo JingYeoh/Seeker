@@ -22,39 +22,63 @@ class ReferencedClassProcessor {
     static final String GROUP = "ReferencedClass"
 
     /**
+     * 是否已经处理过该类
+     * @param className 要处理的类
+     * @param targetClass 含有 @Hide 注解的类
+     * @return 是否已经处理过反射缓存
+     */
+    static boolean isProcessedInCache(String className, String referencedClass, String jarZipDir) {
+        // 如果是否已经处理过该类了，则忽略
+        if (DataSource.isProcessedRefDelegate(className, referencedClass)) {
+            Log.i(LOG_LEVEL, GROUP, "class " + className + " has been proceed logger from memory cache")
+            startProcess(className, referencedClass, jarZipDir, false)
+            return true
+        }
+        return false
+    }
+
+    /**
      * 处理调用被 @Hide 注解标记的方法的类
      * @param className 要处理的类
      * @param targetClass 含有 @Hide 注解的类
+     * @return 是否进行 jar 重新打包
      */
     static boolean process(String className, String referencedClass, String jarZipDir) {
         // 如果处理的类就是「反射缓存类」，则忽略
         if (GenerateUtils.isClassEqual(className, generateRefDelegateClassName(referencedClass))) {
             return false
         }
+        // 如果是否已经处理过该类了（在缓存中判断），则忽略
+        if (isProcessedInCache(className, referencedClass, jarZipDir)) {
+            return true
+        }
         CtClass c = SeekerTransform.pool.getCtClass(className)
         if (c.isFrozen()) {
             c.defrost()
         }
-
+        // 判断类是否已经被处理过（判断条件：含有「反射缓存代理类」）
         for (int i = 0; i < c.refClasses.size(); i++) {
             def it = c.refClasses[i]
-            // 判断类是否已经被处理过
             if (GenerateUtils.isClassEqual(it, generateRefDelegateClassName(referencedClass))) {
                 Log.i(LOG_LEVEL, GROUP, "class " + className + " has been proceed")
-                startProcess(className, it, jarZipDir, false)
-                return false
+                startProcess(className, referencedClass, jarZipDir, false)
+                return true
             }
         }
-        boolean hasTarget = false
-        // 判断类中是否含有被 @Hide 标记的类
+        // 判断类中是否含有被 @Hide 标记的类的方法调用
         for (int i = 0; i < c.refClasses.size(); i++) {
             def it = c.refClasses[i]
+            // 如果是否已经处理过该类了（在缓存中判断），则忽略，之所以在此处要再次判断是因为：有时候一个类会返回两次（可能是javassist问题）
+            if (isProcessedInCache(className, referencedClass, jarZipDir)) {
+                continue
+            }
             if (GenerateUtils.isClassEqual(referencedClass, it)) {
-                startProcess(className, it, jarZipDir, true)
-                hasTarget = true
+                startProcess(className, referencedClass, jarZipDir, true)
+                // 缓存到内存中
+                DataSource.putToRefCache(className, referencedClass)
             }
         }
-        return hasTarget
+        return true
     }
 
     /**

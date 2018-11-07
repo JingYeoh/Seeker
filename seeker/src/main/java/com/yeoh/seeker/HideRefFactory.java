@@ -12,28 +12,28 @@ import java.util.Map;
  */
 public class HideRefFactory {
 
-    private static Map<Class, Map<HideMethod, Method>> methodMap;
+    private static Map<Class, Map<String, Method>> methodMap;
 
     static Method getMethod(Class refName, HideMethod hideMethod) {
         if (methodMap == null) {
             return null;
         }
-        Map<HideMethod, Method> methods = methodMap.get(refName);
+        Map<String, Method> methods = methodMap.get(refName);
         if (methods == null) {
             return null;
         }
-        return methods.get(hideMethod);
+        return methods.get(hideMethod.toString());
     }
 
     static void putMethod(Class refName, HideMethod hideMethod, Method method) {
         if (methodMap == null) {
             methodMap = new HashMap<>();
         }
-        Map<HideMethod, Method> methods = methodMap.get(refName);
+        Map<String, Method> methods = methodMap.get(refName);
         if (methods == null) {
             methods = new HashMap<>();
             methodMap.put(refName, methods);
         }
-        methods.put(hideMethod, method);
+        methods.put(hideMethod.toString(), method);
     }
 }
