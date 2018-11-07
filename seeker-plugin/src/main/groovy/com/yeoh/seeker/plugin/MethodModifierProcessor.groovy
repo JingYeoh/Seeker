@@ -15,6 +15,7 @@ import javassist.bytecode.Descriptor
  */
 class MethodModifierProcessor {
 
+    private static final int LOG_LEVEL = 3
     static final String GROUP = "MethodModifier"
 
     /**
@@ -62,25 +63,25 @@ class MethodModifierProcessor {
         if (hideMethods == null) {
             return
         }
-        Log.i(2, GROUP, "begin to process class :" + className)
-        Log.i(3, GROUP, "hideMethods = " + hideMethods)
+        Log.i(LOG_LEVEL, GROUP, "begin to process class :" + className)
+        Log.i(LOG_LEVEL + 1, GROUP, "hideMethods = " + hideMethods)
 
         c.setModifiers(AccessFlag.setPublic(c.getModifiers()))
 
         hideMethods.forEach({
             processTargetMethod(c, it)
         })
-        Log.i(2, GROUP, "done")
+        Log.i(LOG_LEVEL, GROUP, "done")
     }
 
     /**
      * 对添加 @Hide 注解的方法进行处理
      */
     private static void processTargetMethod(CtClass c, def hideMethod) {
-        Log.i(3, GROUP, " start to change method: " + hideMethod.toString())
+        Log.i(LOG_LEVEL + 1, GROUP, " start to change method: " + hideMethod.toString())
 
         CtClass returns = SeekerTransform.pool.getCtClass(hideMethod.returns)
-        Log.i(4, GROUP, "returns get success...")
+        Log.i(LOG_LEVEL + 2, GROUP, "returns get success...")
 
         CtClass[] params = null
         if (hideMethod.params != null) {
@@ -91,7 +92,7 @@ class MethodModifierProcessor {
             }
         }
         String descriptor = Descriptor.ofMethod(returns, params)
-        Log.i(4, GROUP, "descriptor get success...")
+        Log.i(LOG_LEVEL + 2, GROUP, "descriptor get success...")
 
         CtMethod ctMethod = GenerateUtils.getMethod(c, hideMethod.methodName, descriptor)
         if (ctMethod == null) {
@@ -99,7 +100,7 @@ class MethodModifierProcessor {
         }
         // 改变 modifier 的值
         GenerateUtils.changeModifier(ctMethod, hideMethod.modifier)
-        Log.i(3, GROUP, c.name + "#" + hideMethod.methodName + " modifier changed to " + hideMethod.modifier)
+        Log.i(LOG_LEVEL + 1, GROUP, c.name + "#" + hideMethod.methodName + " modifier changed to " + hideMethod.modifier)
         // TODO: 删除 @Hide Annotation
     }
 }

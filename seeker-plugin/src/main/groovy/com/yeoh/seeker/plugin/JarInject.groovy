@@ -6,11 +6,12 @@ import org.apache.commons.io.FileUtils
 
 class JarInject {
 
+    private static final int LOG_LEVEL = 2
     private static boolean haveTarget = false
     private static final String GROUP = "JarInject"
 
     static void injectJar(path) throws Exception {
-        Log.i(2, GROUP, "inject jar")
+        Log.i(LOG_LEVEL, GROUP, "inject jar")
         if (path.endsWith(".jar")) {
             File jarFile = new File(path)
             String jarZipDir = jarFile.getParent() + "/" + jarFile.getName().replace('.jar', '')
@@ -20,11 +21,11 @@ class JarInject {
             try {
                 boolean haveTarget = traverseClassList(classNameList, jarZipDir)
                 if (haveTarget) {
-                    Log.i(3, GROUP, "found jar target :" + jarZipDir)
+                    Log.i(LOG_LEVEL + 1, GROUP, "found jar target :" + jarZipDir)
                     jarFile.delete()
                     JarUtils.jar(jarFile, unJar)
                 } else {
-                    Log.i(3, GROUP, "not found target class")
+                    Log.i(LOG_LEVEL + 1, GROUP, "not found target class")
                 }
             } catch (Exception e) {
                 throw e
@@ -32,12 +33,11 @@ class JarInject {
                 FileUtils.deleteDirectory(new File(jarZipDir))
             }
         }
-        Log.ln(2, GROUP)
+        Log.ln(LOG_LEVEL, GROUP)
     }
 
     private static boolean traverseClassList(List classNameList, String jarZipDir) {
         haveTarget = false
-//        Log.d("DatSource.seekerConfig = " + DataSource.seekerConfig)
         for (String className : classNameList) {
             if (className.endsWith(".class")
                     && !className.contains('R$')

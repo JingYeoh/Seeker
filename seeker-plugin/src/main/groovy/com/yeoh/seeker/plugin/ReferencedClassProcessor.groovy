@@ -16,6 +16,7 @@ import javassist.expr.NewExpr
  */
 class ReferencedClassProcessor {
 
+    private static final int LOG_LEVEL = 3
     static final String REF_DELEGATE_SUFFIX = "RefDelegate"
     static final String REF_DELEGATE_PREFIX = "_"
     static final String GROUP = "ReferencedClass"
@@ -39,7 +40,7 @@ class ReferencedClassProcessor {
             def it = c.refClasses[i]
             // 判断类是否已经被处理过
             if (GenerateUtils.isClassEqual(it, generateRefDelegateClassName(referencedClass))) {
-                Log.i(2, GROUP, "class " + className + " has been proceed")
+                Log.i(LOG_LEVEL, GROUP, "class " + className + " has been proceed")
                 startProcess(className, it, jarZipDir, false)
                 return false
             }
@@ -64,7 +65,7 @@ class ReferencedClassProcessor {
      * @param process 是否对方法进行处理，必须要进行 jar 打包过程，否则已经替换过的会不生效
      */
     private static void startProcess(String hostClass, String referencedClass, String path, boolean process) {
-        Log.i(2, GROUP, "start process " + hostClass)
+        Log.i(LOG_LEVEL, GROUP, "start process " + hostClass)
         CtClass host = SeekerTransform.pool.getCtClass(hostClass)
         if (host.isFrozen()) {
             host.defrost()
@@ -74,8 +75,8 @@ class ReferencedClassProcessor {
         }
         host.writeFile(path)
         SeekerTransform.jarClassList.add(host)
-        Log.i(2, GROUP, "process end ...")
-        Log.ln(2, GROUP)
+        Log.i(LOG_LEVEL, GROUP, "process end ...")
+        Log.ln(LOG_LEVEL, GROUP)
     }
 
     /**
@@ -88,15 +89,15 @@ class ReferencedClassProcessor {
             return
         }
         String hostClass = c.name
-        Log.i(3, GROUP, "start to process referenced class :" + hostClass)
+        Log.i(LOG_LEVEL + 1, GROUP, "start to process referenced class :" + hostClass)
 
         // 遍历类中的所有方法，获取方法中涉及到的类，然后和 HideMethod 进行对比
         c.classFile.getMethods().forEach({
             extractReferencedClassFromMethod(c, referencedClass, it)
         })
 
-        Log.i(3, GROUP, "done")
-        Log.ln(3, GROUP)
+        Log.i(LOG_LEVEL + 1, GROUP, "done")
+        Log.ln(LOG_LEVEL + 1, GROUP)
     }
 
     /**
@@ -109,11 +110,11 @@ class ReferencedClassProcessor {
         String methodName = info.name
         // 通过 descriptor　获取方法参数中的类
         String descriptor = info.descriptor
-        Log.i(4, GROUP, "methodName = " + methodName)
+        Log.i(LOG_LEVEL + 2, GROUP, "methodName = " + methodName)
         CtMethod ctMethod = GenerateUtils.getMethod(ctClass, methodName, descriptor)
-        Log.i(4, GROUP, "method = " + ctMethod)
+        Log.i(LOG_LEVEL + 2, GROUP, "method = " + ctMethod)
 
-        Log.i(4, GROUP, "findInSeeker start...")
+        Log.i(LOG_LEVEL + 2, GROUP, "findInSeeker start...")
         if (ctMethod != null) {
             ctMethod.instrument(new ExprEditor() {
                 @Override
@@ -122,8 +123,8 @@ class ReferencedClassProcessor {
                 }
             })
         }
-        Log.i(4, GROUP, "findInSeeker end...")
-        Log.ln(4, GROUP)
+        Log.i(LOG_LEVEL + 2, GROUP, "findInSeeker end...")
+        Log.ln(LOG_LEVEL + 2, GROUP)
     }
 
     /**
@@ -136,10 +137,10 @@ class ReferencedClassProcessor {
                 referencedClassName.replace("\$", ".") != e.className) {
             return
         }
-        Log.i(5, GROUP, "find referenced class: " + e.className)
+        Log.i(LOG_LEVEL + 3, GROUP, "find referenced class: " + e.className)
         String replaceBody = "{ " + "\$_ = new " + generateRefDelegateClassName(referencedClassName) + "(\$proceed(\$\$)); " + "}"
 
-        Log.i(5, GROUP, replaceBody)
+        Log.i(LOG_LEVEL + 3, GROUP, replaceBody)
         e.replace(replaceBody)
     }
 
