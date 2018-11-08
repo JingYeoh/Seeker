@@ -2,6 +2,7 @@ package com.yeoh.seeker.plugin
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
+import com.google.common.collect.Sets
 import com.yeoh.seeker.plugin.utils.Log
 import com.yeoh.seeker.plugin.utils.ThrowExecutionError
 import groovy.json.JsonSlurper
@@ -38,7 +39,8 @@ class SeekerTransform extends Transform {
 
     @Override
     Set<? super QualifiedContent.Scope> getScopes() {
-        return TransformManager.SCOPE_FULL_PROJECT
+//        return TransformManager.SCOPE_FULL_PROJECT
+        return Sets.immutableEnumSet(QualifiedContent.Scope.PROJECT)
     }
 
     @Override
@@ -117,6 +119,9 @@ class SeekerTransform extends Transform {
      * 处理 jar 包
      */
     private static void processJar() {
+        if (jarPathList.empty) {
+            Log.i(LOG_LEVEL + 1, GROUP, "find none jars in transform...")
+        }
         for (String jarPath : jarPathList) {
             JarInject.injectJar(jarPath)
         }
