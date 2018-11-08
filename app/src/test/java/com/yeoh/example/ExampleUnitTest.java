@@ -1,6 +1,5 @@
 package com.yeoh.example;
 
-import com.yeoh.mock.sub.Caller;
 import org.junit.Test;
 
 /**
@@ -12,7 +11,7 @@ public class ExampleUnitTest {
 
     @Test
     public void addition_isCorrect() throws ClassNotFoundException {
-        Caller.mock();
+//        Caller.mock();
         assert int[].class == Class.forName("[I");
         assert String[].class == Class.forName("[Ljava.lang.String;");
     }
