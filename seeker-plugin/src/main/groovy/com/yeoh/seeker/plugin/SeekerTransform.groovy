@@ -84,7 +84,6 @@ class SeekerTransform extends Transform {
         inputs.each { TransformInput input ->
             input.directoryInputs.each { DirectoryInput directoryInput ->
                 File configFile = new File(PATH_SEEKER_JSON)
-                Log.i(LOG_LEVEL + 2, GROUP, configFile.path)
                 if (configFile.exists()) {
                     def content = new StringBuilder()
                     configFile.eachLine("UTF-8") {
@@ -94,6 +93,7 @@ class SeekerTransform extends Transform {
                     data.keySet().forEach {
                         DataSource.seekerConfig.put(it, data.get(it))
                     }
+                    Log.i(LOG_LEVEL + 2, GROUP, "read seeker config success...")
                 } else {
                     ThrowExecutionError.throwError("seeker.json does not exist")
                 }

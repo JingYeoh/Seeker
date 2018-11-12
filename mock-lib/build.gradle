@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
-//apply plugin: 'seeker-plugin'
+apply plugin: 'seeker-plugin'
 
 def ext = rootProject.ext
 

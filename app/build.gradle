@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'seeker-plugin'
+//apply plugin: 'seeker-plugin'
 
 def ext = rootProject.ext
 
