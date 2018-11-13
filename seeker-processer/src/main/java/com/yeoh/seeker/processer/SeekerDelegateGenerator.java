@@ -58,7 +58,7 @@ class SeekerDelegateGenerator {
             return false;
         }
         HideMethodCacher.readFromCache();
-        generateModuleClass();
+//        generateModuleClass();
         HideMethodCacher.putAll(mHideMethodMap);
         new HideRefDelegateGenerator(mFiler, mHideMethodMap).generate();
 //        new SeekerDelegateJsonGenerator(mFiler, HideMethodCacher.getAll()).generate();
