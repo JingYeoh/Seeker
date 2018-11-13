@@ -1,5 +1,8 @@
-package com.yeoh.seeker.plugin
+package com.yeoh.seeker.plugin.v2
 
+import com.yeoh.seeker.plugin.DataSource
+import com.yeoh.seeker.plugin.SeekerProcessor
+import com.yeoh.seeker.plugin.SeekerTransform
 import com.yeoh.seeker.plugin.utils.GenerateUtils
 import com.yeoh.seeker.plugin.utils.Log
 import javassist.CannotCompileException
@@ -14,7 +17,7 @@ import javassist.expr.NewExpr
  *
  * 修改调用逻辑，把原来的正常调用的方法换为生成的通过反射调用的方法.
  */
-class ReferencedClassProcessor {
+class ReferencedClassProcessor2 extends SeekerProcessor {
 
     private static final int LOG_LEVEL = 3
     static final String REF_DELEGATE_SUFFIX = "RefDelegate"
@@ -52,7 +55,7 @@ class ReferencedClassProcessor {
         if (isProcessedInCache(className, referencedClass, jarZipDir)) {
             return true
         }
-        CtClass c = SeekerTransform.pool.getCtClass(className)
+        CtClass c = mClassPool.getCtClass(className)
         if (c.isFrozen()) {
             c.defrost()
         }
@@ -90,7 +93,7 @@ class ReferencedClassProcessor {
      */
     private static void startProcess(String hostClass, String referencedClass, String path, boolean process) {
         Log.i(LOG_LEVEL, GROUP, "start process " + hostClass)
-        CtClass host = SeekerTransform.pool.getCtClass(hostClass)
+        CtClass host = mClassPool.getCtClass(hostClass)
         if (host.isFrozen()) {
             host.defrost()
         }

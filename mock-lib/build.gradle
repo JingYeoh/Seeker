@@ -52,3 +52,8 @@ uploadArchives {
 }.doLast {
     println 'print after upLoadArchives'
 }
+
+seeker{
+    enable = true
+    debugEnable = true
+}

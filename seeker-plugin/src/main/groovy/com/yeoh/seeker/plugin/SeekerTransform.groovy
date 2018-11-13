@@ -20,7 +20,7 @@ class SeekerTransform extends Transform {
     static List<DirectoryInput> classFileList
     static List<String> jarPathList
     static List<CtClass> jarClassList
-    static final String PATH_SEEKER_JSON = "./build/Seeker/seeker.json"
+    static final String PATH_SEEKER_JSON = "./build/SeekerExt/seeker.json"
 
     SeekerTransform(Project project) {
         mProject = project
@@ -29,7 +29,7 @@ class SeekerTransform extends Transform {
 
     @Override
     String getName() {
-        return "Seeker"
+        return "SeekerExt"
     }
 
     @Override

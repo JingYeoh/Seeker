@@ -1,11 +1,29 @@
 package com.yeoh.seeker.plugin.tasks
 
+
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 
 /**
- * Seeker Task 类，用于在 :Jar 执行之后修改 jar 包.
+ * SeekerExt Task 类，用于在 :Jar 执行之后修改 jar 包.
  */
-public class Seeker extends DefaultTask {
+class Seeker extends DefaultTask {
 
-    void action
+    @Input
+    Boolean release
+    @OutputFile
+    File destFile
+
+    Seeker() {
+        group = 'com.yeoh.plugin'
+        description = 'Change class modify and output jar/aar'
+    }
+
+    @TaskAction
+    void action() {
+
+    }
+
 }
