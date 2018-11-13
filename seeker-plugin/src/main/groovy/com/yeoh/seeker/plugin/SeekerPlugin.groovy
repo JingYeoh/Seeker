@@ -23,18 +23,15 @@ class SeekerPlugin implements Plugin<Project> {
     private SeekerExt mSeekerExt
     private static ClassPool mPool
 
-    static final String PATH_SEEKER_JSON = "./build/SeekerExt/seeker.json"
-
     @Override
     void apply(Project project) {
         mProject = project
-        pool = ClassPool.getDefault()
+        mPool = ClassPool.getDefault()
 
         checkAndroidPlugin()
         configureExtension()
 
         mProject.afterEvaluate {
-            configureSeeker()
             readExtension()
             doAction()
         }
@@ -60,26 +57,6 @@ class SeekerPlugin implements Plugin<Project> {
     }
 
     /**
-     * 配置 Seeker ，读取本地 json 文件
-     */
-    private void configureSeeker() {
-        File configFile = new File(PATH_SEEKER_JSON)
-        if (configFile.exists()) {
-            def content = new StringBuilder()
-            configFile.eachLine("UTF-8") {
-                content.append(it)
-            }
-            Map data = new JsonSlurper().parseText(content.toString())
-            data.keySet().forEach {
-                DataSource.seekerConfig.put(it, data.get(it))
-            }
-            Log.i(1, GROUP, "read seeker config success...")
-        } else {
-            ThrowExecutionError.throwError("seeker.json does not exist")
-        }
-    }
-
-    /**
      * 读取 Extension 配置
      */
     private void readExtension() {
@@ -93,7 +70,7 @@ class SeekerPlugin implements Plugin<Project> {
      */
     private void doAction() {
         if (!mSeekerExt.enable) {
-            Log.d("SeekerExt Plugin is no enabled !")
+            Log.d("seeker plugin is not enabled!")
             return
         }
         Log.d("-------------- SEEKER PLUGIN --------------")

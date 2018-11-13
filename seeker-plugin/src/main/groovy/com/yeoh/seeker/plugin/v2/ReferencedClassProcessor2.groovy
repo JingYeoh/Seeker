@@ -2,7 +2,6 @@ package com.yeoh.seeker.plugin.v2
 
 import com.yeoh.seeker.plugin.DataSource
 import com.yeoh.seeker.plugin.SeekerProcessor
-import com.yeoh.seeker.plugin.SeekerTransform
 import com.yeoh.seeker.plugin.utils.GenerateUtils
 import com.yeoh.seeker.plugin.utils.Log
 import javassist.CannotCompileException
@@ -101,7 +100,6 @@ class ReferencedClassProcessor2 extends SeekerProcessor {
             doProcess(host, referencedClass)
         }
         host.writeFile(path)
-        SeekerTransform.jarClassList.add(host)
         Log.i(LOG_LEVEL, GROUP, "process end ...")
         Log.ln(LOG_LEVEL, GROUP)
     }

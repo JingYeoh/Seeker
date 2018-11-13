@@ -2,7 +2,9 @@ package com.yeoh.seeker.plugin
 
 
 import com.yeoh.seeker.plugin.utils.Log
+import com.yeoh.seeker.plugin.utils.ThrowExecutionError
 import com.yeoh.seeker.plugin.v2.JarInject2
+import groovy.json.JsonSlurper
 import javassist.ClassPool
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -15,15 +17,17 @@ import org.gradle.api.Task
  */
 class VariantProcessor {
 
+    static final String PATH_SEEKER_JSON = "./build/Seeker/seeker.json"
+
     private static final int LEVEL = 1
     private static final String GROUP = "VariantProcessor"
     private final Project mProject
-    private final ClassPool mPool
+    private final ClassPool mClassPool
     private final def mVariant
 
-    VariantProcessor(Project project, ClassPool pool, variant) {
+    VariantProcessor(Project project, ClassPool classPool, variant) {
         mProject = project
-        mPool = pool
+        mClassPool = classPool
         mVariant = variant
     }
 
@@ -63,6 +67,7 @@ class VariantProcessor {
                 throw new RuntimeException("Can not find task ${taskPath}!")
             }
             syncLibTask.doLast {
+                configureSeeker()
                 File dustDir = mProject.file(mProject.buildDir.path + '/intermediates/packaged-classes/' + mVariant.dirName)
                 Log.i(LEVEL + 1, GROUP, "outputDir = " + dustDir)
                 processJars(dustDir)
@@ -71,9 +76,30 @@ class VariantProcessor {
     }
 
     /**
+     * 配置 Seeker ，读取本地 json 文件
+     */
+    private void configureSeeker() {
+        File configFile = new File(PATH_SEEKER_JSON)
+        if (configFile.exists()) {
+            def content = new StringBuilder()
+            configFile.eachLine("UTF-8") {
+                content.append(it)
+            }
+            Map data = new JsonSlurper().parseText(content.toString())
+            data.keySet().forEach {
+                DataSource.seekerConfig.put(it, data.get(it))
+            }
+            Log.i(1, GROUP, "read seeker config success...")
+        } else {
+            ThrowExecutionError.throwError("seeker.json does not exist")
+        }
+    }
+
+    /**
      * 处理 jar 文件
      */
     private void processJars(File jarsDir) {
+        mClassPool.appendClassPath(mProject.android.bootClasspath[0].toString())
         if (jarsDir == null) {
             Log.i(LEVEL + 1, GROUP, "${jarsDir} is not exist")
             return
@@ -81,11 +107,11 @@ class VariantProcessor {
         for (file in jarsDir.listFiles()) {
             if (file.path.endsWith(".jar")) {
                 Log.i(LEVEL + 2, GROUP, "find jar, path = " + file.path)
-                mPool.appendClassPath(file.absolutePath)
+                mClassPool.appendClassPath(file.absolutePath)
             }
         }
         // inject jar ，重新注入代码
-        JarInject2 jarInject = new JarInject2(mPool)
+        JarInject2 jarInject = new JarInject2(mClassPool)
         for (file in jarsDir.listFiles()) {
             if (file.path.endsWith(".jar")) {
                 jarInject.appendJarPath(file.path)

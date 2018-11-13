@@ -2,7 +2,6 @@ package com.yeoh.seeker.plugin.v2
 
 import com.yeoh.seeker.plugin.DataSource
 import com.yeoh.seeker.plugin.SeekerProcessor
-import com.yeoh.seeker.plugin.SeekerTransform
 import com.yeoh.seeker.plugin.utils.GenerateUtils
 import com.yeoh.seeker.plugin.utils.Log
 import com.yeoh.seeker.plugin.utils.ThrowExecutionError
@@ -51,7 +50,6 @@ class MethodModifierProcessor2 extends SeekerProcessor {
         doProcess(c)
 
         c.writeFile(jarZipDir)
-        SeekerTransform.jarClassList.add(c)
     }
     /**
      * 处理字节码

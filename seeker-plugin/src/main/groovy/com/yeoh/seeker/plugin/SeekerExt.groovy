@@ -2,7 +2,7 @@ package com.yeoh.seeker.plugin
 /**
  * SeekerExt 的配置类
  */
-public class SeekerExt {
+class SeekerExt {
 
     public static final String NAME = 'seeker'
     boolean enable = true
