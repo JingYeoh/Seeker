@@ -1,7 +1,6 @@
-package com.yeoh.seeker.plugin.v2
+package com.yeoh.seeker.plugin.processor
 
 import com.yeoh.seeker.plugin.DataSource
-import com.yeoh.seeker.plugin.SeekerProcessor
 import com.yeoh.seeker.plugin.utils.GenerateUtils
 import com.yeoh.seeker.plugin.utils.Log
 import javassist.CannotCompileException
@@ -16,7 +15,7 @@ import javassist.expr.NewExpr
  *
  * 修改调用逻辑，把原来的正常调用的方法换为生成的通过反射调用的方法.
  */
-class ReferencedClassProcessor2 extends SeekerProcessor {
+class ReferencedClassProcessor extends SeekerProcessor {
 
     private static final int LOG_LEVEL = 3
     static final String REF_DELEGATE_SUFFIX = "RefDelegate"

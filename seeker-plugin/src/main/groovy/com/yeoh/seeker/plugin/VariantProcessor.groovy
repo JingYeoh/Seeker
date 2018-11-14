@@ -3,7 +3,6 @@ package com.yeoh.seeker.plugin
 
 import com.yeoh.seeker.plugin.utils.Log
 import com.yeoh.seeker.plugin.utils.ThrowExecutionError
-import com.yeoh.seeker.plugin.v2.JarInject2
 import groovy.json.JsonSlurper
 import javassist.ClassPool
 import org.gradle.api.Project
@@ -111,7 +110,7 @@ class VariantProcessor {
             }
         }
         // inject jar ，重新注入代码
-        JarInject2 jarInject = new JarInject2(mClassPool)
+        JarInject jarInject = new JarInject(mClassPool)
         for (file in jarsDir.listFiles()) {
             if (file.path.endsWith(".jar")) {
                 jarInject.appendJarPath(file.path)

@@ -1,6 +1,8 @@
-package com.yeoh.seeker.plugin.v2
+package com.yeoh.seeker.plugin
 
 import com.yeoh.seeker.plugin.DataSource
+import com.yeoh.seeker.plugin.processor.MethodModifierProcessor
+import com.yeoh.seeker.plugin.processor.ReferencedClassProcessor
 import com.yeoh.seeker.plugin.utils.JarUtils
 import com.yeoh.seeker.plugin.utils.Log
 import javassist.ClassPool
@@ -18,7 +20,7 @@ import org.apache.commons.io.FileUtils
  * @author Yeoh @ Zhihu Inc.
  * @since 2018/11/13
  */
-class JarInject2 {
+class JarInject {
 
     private static final int LOG_LEVEL = 2
     private static final String GROUP = "JarInject"
@@ -27,7 +29,7 @@ class JarInject2 {
     private final ClassPool mClassPool
     private List<String> mJarPaths
 
-    JarInject2(ClassPool pool) {
+    JarInject(ClassPool pool) {
         mClassPool = pool
         mJarPaths = new ArrayList<>()
     }
@@ -46,8 +48,8 @@ class JarInject2 {
      * 开始注入
      */
     void inject() throws Exception {
-        MethodModifierProcessor2.setClassPool(mClassPool)
-        ReferencedClassProcessor2.setClassPool(mClassPool)
+        MethodModifierProcessor.setClassPool(mClassPool)
+        ReferencedClassProcessor.setClassPool(mClassPool)
         mJarPaths.forEach({
             injectJar(it)
         })
@@ -101,11 +103,11 @@ class JarInject2 {
 
                 DataSource.seekerConfig.keySet().forEach({
                     // 寻找是否含有 @Hide 注解的类
-                    if (MethodModifierProcessor2.process(className, it, jarZipDir)) {
+                    if (MethodModifierProcessor.process(className, it, jarZipDir)) {
                         haveTarget = true
                     } else {
                         // 含有 @Hide 注解的类不进行反射处理，只处理调用的类
-                        boolean result = ReferencedClassProcessor2.process(className, it, jarZipDir)
+                        boolean result = ReferencedClassProcessor.process(className, it, jarZipDir)
                         // 不可以覆盖上面的查询结果，如果直接赋值的话可能改 jar 包中含有 @Hide 的类无法被打包
                         haveTarget = !haveTarget ? result : haveTarget
                     }

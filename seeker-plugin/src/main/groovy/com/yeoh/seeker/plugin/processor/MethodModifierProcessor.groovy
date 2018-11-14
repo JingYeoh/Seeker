@@ -1,7 +1,6 @@
-package com.yeoh.seeker.plugin.v2
+package com.yeoh.seeker.plugin.processor
 
 import com.yeoh.seeker.plugin.DataSource
-import com.yeoh.seeker.plugin.SeekerProcessor
 import com.yeoh.seeker.plugin.utils.GenerateUtils
 import com.yeoh.seeker.plugin.utils.Log
 import com.yeoh.seeker.plugin.utils.ThrowExecutionError
@@ -15,7 +14,7 @@ import javassist.bytecode.Descriptor
  *
  * 修改方法的 modifier 为指定的 modifier.
  */
-class MethodModifierProcessor2 extends SeekerProcessor {
+class MethodModifierProcessor extends SeekerProcessor {
 
     private static final int LOG_LEVEL = 3
     static final String GROUP = "MethodModifier"
