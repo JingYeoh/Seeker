@@ -98,6 +98,7 @@ class VariantProcessor {
      * 处理 jar 文件
      */
     private void processJars(File jarsDir) {
+        mClassPool.clearImportedPackages()
         mClassPool.appendClassPath(mProject.android.bootClasspath[0].toString())
         if (jarsDir == null) {
             Log.i(LEVEL + 1, GROUP, "${jarsDir} is not exist")
