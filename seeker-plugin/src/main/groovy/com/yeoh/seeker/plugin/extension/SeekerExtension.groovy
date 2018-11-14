@@ -1,8 +1,8 @@
-package com.yeoh.seeker.plugin
+package com.yeoh.seeker.plugin.extension
 /**
- * SeekerExt 的配置类
+ * SeekerExtension 的配置类
  */
-class SeekerExt {
+class SeekerExtension {
 
     public static final String NAME = 'seeker'
     boolean enable = true

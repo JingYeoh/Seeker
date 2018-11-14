@@ -136,7 +136,7 @@ class ReferencedClassProcessor2 extends SeekerProcessor {
         // 通过 descriptor　获取方法参数中的类
         String descriptor = info.descriptor
         Log.i(LOG_LEVEL + 2, GROUP, "methodName = " + methodName)
-        CtMethod ctMethod = GenerateUtils.getMethod(ctClass, methodName, descriptor)
+        CtMethod ctMethod = GenerateUtils.getMethod(mClassPool, ctClass, methodName, descriptor)
         Log.i(LOG_LEVEL + 2, GROUP, "method = " + ctMethod)
 
         Log.i(LOG_LEVEL + 2, GROUP, "findInSeeker start...")
@@ -153,7 +153,7 @@ class ReferencedClassProcessor2 extends SeekerProcessor {
     }
 
     /**
-     * 在 SeekerExt 中寻找是否有匹配的类
+     * 在 SeekerExtension 中寻找是否有匹配的类
      * @param e 方法中创建新对象的代码，在此处进行替换为反射代理类
      * @param referencedClassName 含有 @Hide 注解的类名
      */

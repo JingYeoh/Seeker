@@ -1,6 +1,7 @@
 package com.yeoh.seeker.plugin.utils
 
-import com.yeoh.seeker.plugin.SeekerTransform
+
+import javassist.ClassPool
 import javassist.CtClass
 import javassist.CtMethod
 import javassist.bytecode.AccessFlag
@@ -45,7 +46,7 @@ class GenerateUtils {
      * @param descriptor 　参数 descriptor
      * @return 方法
      */
-    static CtMethod getMethod(CtClass ctClass, String methodName, String descriptor) {
+    static CtMethod getMethod(ClassPool pool, CtClass ctClass, String methodName, String descriptor) {
         if (methodName == null || methodName == "<init>") {
             return null
         }
@@ -64,7 +65,7 @@ class GenerateUtils {
             if (!paramsNames.isEmpty()) {
                 CtClass[] params = new CtClass[paramsNames.size()]
                 for (int i = 0; i < paramsNames.size(); i++) {
-                    params[i] = SeekerTransform.pool.getCtClass(paramsNames[i])
+                    params[i] = pool.getCtClass(paramsNames[i])
                 }
                 method = ctClass.getDeclaredMethod(methodName, params)
             }

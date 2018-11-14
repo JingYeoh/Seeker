@@ -3,9 +3,8 @@ package com.yeoh.seeker.plugin
 
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
+import com.yeoh.seeker.plugin.extension.SeekerExtension
 import com.yeoh.seeker.plugin.utils.Log
-import com.yeoh.seeker.plugin.utils.ThrowExecutionError
-import groovy.json.JsonSlurper
 import javassist.ClassPool
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -20,7 +19,7 @@ import org.gradle.api.Project
 class SeekerPlugin implements Plugin<Project> {
 
     private Project mProject
-    private SeekerExt mSeekerExt
+    private SeekerExtension mSeekerExtension
     private static ClassPool mPool
 
     @Override
@@ -52,24 +51,24 @@ class SeekerPlugin implements Plugin<Project> {
      * 配置 Extension
      */
     private void configureExtension() {
-        mSeekerExt = new SeekerExt()
-        mProject.extensions.create(SeekerExt.NAME, SeekerExt)
+        mSeekerExtension = new SeekerExtension()
+        mProject.extensions.create(SeekerExtension.NAME, SeekerExtension)
     }
 
     /**
      * 读取 Extension 配置
      */
     private void readExtension() {
-        mSeekerExt.copy(mProject[SeekerExt.NAME])
-        Log.d(mSeekerExt.toString())
-        Log.Debug = mSeekerExt.debugEnable
+        mSeekerExtension.copy(mProject[SeekerExtension.NAME])
+        Log.d(mSeekerExtension.toString())
+        Log.Debug = mSeekerExtension.debugEnable
     }
 
     /**
      * 开始执行
      */
     private void doAction() {
-        if (!mSeekerExt.enable) {
+        if (!mSeekerExtension.enable) {
             Log.d("seeker plugin is not enabled!")
             return
         }

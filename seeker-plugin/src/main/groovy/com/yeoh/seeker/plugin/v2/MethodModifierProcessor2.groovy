@@ -95,7 +95,7 @@ class MethodModifierProcessor2 extends SeekerProcessor {
         String descriptor = Descriptor.ofMethod(returns, params)
         Log.i(LOG_LEVEL + 2, GROUP, "descriptor get success...")
 
-        CtMethod ctMethod = GenerateUtils.getMethod(c, hideMethod.methodName, descriptor)
+        CtMethod ctMethod = GenerateUtils.getMethod(mClassPool, c, hideMethod.methodName, descriptor)
         if (ctMethod == null) {
             ThrowExecutionError.throwError(c.name + " not found method:  " + hideMethod.methodName)
         }
