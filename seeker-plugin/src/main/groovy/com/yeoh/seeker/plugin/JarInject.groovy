@@ -64,7 +64,7 @@ class JarInject {
         Log.i(LOG_LEVEL, GROUP, "inject jar " + path)
 
         File jarFile = new File(path)
-        String jarZipDir = jarFile.getParent() + "/" + jarFile.getName().replace('.jar', '')
+        String jarZipDir = JarUtils.getExtractJarPath(jarFile)
         File unJar = new File(jarZipDir)
         List classNameList = JarUtils.unJar(jarFile, unJar)
 

@@ -10,6 +10,12 @@ class DataSource {
 
     def static seekerConfig = [:]
     private static Map<String, List<String>> processedRef = [:]
+    // aar/jar　等解压后的路径，task　执行完毕后需要删除这些临时文件
+    static Set<String> TEMP_DIRS = new HashSet<>()
+    // 依赖的第三方库 jar 解压后的路径，用于在编译时生效
+    static Set<String> DEPENDENCIES_JARS_PATH = new HashSet<>()
+    // 依赖的第三方库
+    static Set<String> DEPENDENCIES_PATH = []
 
     def static clear() {
         seekerConfig = [:]
@@ -45,5 +51,4 @@ class DataSource {
         }
         return referencedClasses.contains(referencedClass)
     }
-
 }

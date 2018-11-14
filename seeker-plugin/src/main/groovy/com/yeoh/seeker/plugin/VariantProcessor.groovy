@@ -1,6 +1,7 @@
 package com.yeoh.seeker.plugin
 
-
+import com.yeoh.seeker.plugin.utils.AarUtils
+import com.yeoh.seeker.plugin.utils.JarUtils
 import com.yeoh.seeker.plugin.utils.Log
 import com.yeoh.seeker.plugin.utils.ThrowExecutionError
 import groovy.json.JsonSlurper
@@ -18,7 +19,7 @@ class VariantProcessor {
 
     static final String PATH_SEEKER_JSON = "./build/Seeker/seeker.json"
 
-    private static final int LEVEL = 1
+    private static final int LEVEL = 2
     private static final String GROUP = "VariantProcessor"
     private final Project mProject
     private final ClassPool mClassPool
@@ -66,12 +67,44 @@ class VariantProcessor {
                 throw new RuntimeException("Can not find task ${taskPath}!")
             }
             syncLibTask.doLast {
+                configureClassPool()
                 configureSeeker()
                 File dustDir = mProject.file(mProject.buildDir.path + '/intermediates/packaged-classes/' + mVariant.dirName)
                 Log.i(LEVEL + 1, GROUP, "outputDir = " + dustDir)
                 processJars(dustDir)
             }
         }
+    }
+
+    /**
+     * 配置 ClassPool，注入依赖的库到 ClassPool 中
+     */
+    private void configureClassPool() {
+        //　解析依赖的第三方库
+        DataSource.DEPENDENCIES_PATH.forEach({
+            File file = new File(it)
+            if (file.path.endsWith("aar")) {
+                String extractPath = AarUtils.getExtractAarPath(file)
+                DataSource.TEMP_DIRS.add(extractPath)
+
+                File unAar = new File(extractPath)
+                AarUtils.Aar aar = AarUtils.unAar(file, unAar)
+                mClassPool.appendClassPath(aar.extractJarPath)
+                DataSource.DEPENDENCIES_JARS_PATH.add(aar.extractJarPath)
+
+                Log.i(LEVEL + 1, GROUP, "find class jar in aar: " + aar.jarPath)
+            }
+            if (file.path.endsWith("jar")) {
+                String extractJarPath = JarUtils.getExtractJarPath(file)
+                DataSource.TEMP_DIRS.add(extractJarPath)
+                DataSource.DEPENDENCIES_JARS_PATH.add(extractJarPath)
+
+                JarUtils.unJar(file, new File(extractJarPath))
+                mClassPool.appendClassPath(extractJarPath)
+
+                Log.i(LEVEL + 1, GROUP, "find class jar : " + file)
+            }
+        })
     }
 
     /**
@@ -88,7 +121,7 @@ class VariantProcessor {
             data.keySet().forEach {
                 DataSource.seekerConfig.put(it, data.get(it))
             }
-            Log.i(1, GROUP, "read seeker config success...")
+            Log.i(LEVEL, GROUP, "read seeker config success...")
         } else {
             ThrowExecutionError.throwError("seeker.json does not exist")
         }
@@ -101,12 +134,12 @@ class VariantProcessor {
         mClassPool.clearImportedPackages()
         mClassPool.appendClassPath(mProject.android.bootClasspath[0].toString())
         if (jarsDir == null) {
-            Log.i(LEVEL + 1, GROUP, "${jarsDir} is not exist")
+            Log.i(LEVEL, GROUP, "${jarsDir} is not exist")
             return
         }
         for (file in jarsDir.listFiles()) {
             if (file.path.endsWith(".jar")) {
-                Log.i(LEVEL + 2, GROUP, "find jar, path = " + file.path)
+                Log.i(LEVEL + 1, GROUP, "find jar, path = " + file.path)
                 mClassPool.appendClassPath(file.absolutePath)
             }
         }

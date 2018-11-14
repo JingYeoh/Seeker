@@ -16,13 +16,33 @@ import java.util.zip.ZipEntry;
 
 /**
  * Created by lizhaoxuan on 2017/12/31.
- *
+ * <p>
  * This class is copied from Intimate .
- *
+ * <p>
  * https://github.com/JustKiddingBaby/Intimate
  */
 
 public class JarUtils {
+
+    /**
+     * 返回推荐的 jar　解压目录
+     *
+     * @param path jar　文件路径
+     * @return 解压的 jar　路径
+     */
+    public static String getExtractJarPath(String path) {
+        return getExtractJarPath(new File(path));
+    }
+
+    /**
+     * 返回推荐的 jar　解压目录
+     *
+     * @param jarFile jar　文件
+     * @return 解压的 jar　路径
+     */
+    public static String getExtractJarPath(File jarFile) {
+        return jarFile.getParent() + "/" + jarFile.getName().replace(".jar", "");
+    }
 
     public static void jar(File desJar, File jarDir) throws Exception {
         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(desJar));
@@ -56,7 +76,7 @@ public class JarUtils {
         } else {
             prefix = "";
         }
-        for (File f: src) {
+        for (File f : src) {
             jar(f, prefix, jout);
         }
         jout.close();
@@ -74,7 +94,7 @@ public class JarUtils {
             jout.closeEntry();
             File[] files = src.listFiles();
             if (files != null) {
-                for (File file: files) {
+                for (File file : files) {
                     jar(file, prefix, jout);
                 }
             }

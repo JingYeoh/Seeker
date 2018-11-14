@@ -1,6 +1,7 @@
 package com.yeoh.seeker.processer;
 
 import android.support.annotation.NonNull;
+
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -8,11 +9,13 @@ import com.squareup.javapoet.TypeSpec;
 import com.yeoh.seeker.HideMethod;
 import com.yeoh.seeker.HideSeekerDelegate;
 import com.yeoh.seeker.annotation.Hide;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
@@ -42,7 +45,7 @@ class SeekerDelegateGenerator {
     private Map<String, List<HideMethod>> mHideMethodMap;
 
     SeekerDelegateGenerator(String subModules, String moduleName, Filer filer,
-            RoundEnvironment roundEnvironment) {
+                            RoundEnvironment roundEnvironment) {
         mModuleName = moduleName;
         mRoundEnvironment = roundEnvironment;
         mFiler = filer;
@@ -58,7 +61,7 @@ class SeekerDelegateGenerator {
             return false;
         }
         HideMethodCacher.readFromCache();
-//        generateModuleClass();
+        generateModuleClass();
         HideMethodCacher.putAll(mHideMethodMap);
         new HideRefDelegateGenerator(mFiler, mHideMethodMap).generate();
 //        new SeekerDelegateJsonGenerator(mFiler, HideMethodCacher.getAll()).generate();
@@ -75,13 +78,13 @@ class SeekerDelegateGenerator {
         MethodSpec.Builder moduleConstructor = MethodSpec.constructorBuilder();
         moduleConstructor.addStatement("super()");
 
-        for (Element it: mRoundEnvironment.getElementsAnnotatedWith(Hide.class)) {
+        for (Element it : mRoundEnvironment.getElementsAnnotatedWith(Hide.class)) {
             if (it instanceof ExecutableElement) {
                 appendMethodElement((ExecutableElement) it, moduleConstructor);
             }
         }
         if (mSubModuleNames != null && mSubModuleNames.length > 0) {
-            for (String name: mSubModuleNames) {
+            for (String name : mSubModuleNames) {
                 moduleConstructor.addStatement("mHideMethods.putAll(new "
                         + getModuleClassName(name)
                         + "().getHideMethods()"
@@ -90,10 +93,11 @@ class SeekerDelegateGenerator {
             }
         }
         moduleBuilder.addMethod(moduleConstructor.build());
-        JavaFile moduleFile = JavaFile.builder(PACKAGE, moduleBuilder.build())
-                .build();
-        moduleFile.writeTo(mFiler);
-        Log.title("========== Generate seeker delegate end ==========");
+        // 不生成 java 文件
+//        JavaFile moduleFile = JavaFile.builder(PACKAGE, moduleBuilder.build())
+//                .build();
+//        moduleFile.writeTo(mFiler);
+//        Log.title("========== Generate seeker delegate end ==========");
     }
 
     private void appendMethodElement(ExecutableElement element, MethodSpec.Builder moduleConstructor) {
@@ -110,7 +114,7 @@ class SeekerDelegateGenerator {
         Log.i("methodName = " + methodName);
         Log.i("returnName = " + returnName);
 
-        for (VariableElement it: element.getParameters()) {
+        for (VariableElement it : element.getParameters()) {
             TypeMirror methodParameterType = it.asType();
             String paramClassName = methodParameterType.toString();
             params.add(paramClassName);

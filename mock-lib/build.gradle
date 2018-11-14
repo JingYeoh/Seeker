@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
-//apply plugin: 'seeker-plugin'
+apply plugin: 'seeker-plugin'
 
 def ext = rootProject.ext
 
@@ -53,7 +53,7 @@ uploadArchives {
     println 'print after upLoadArchives'
 }
 
-//seeker{
-//    enable = true
-//    debugEnable = true
-//}
+seeker{
+    enable = true
+    debugEnable = true
+}
