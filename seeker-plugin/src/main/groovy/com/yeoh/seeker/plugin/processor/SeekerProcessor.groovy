@@ -1,4 +1,4 @@
-package com.yeoh.seeker.plugin
+package com.yeoh.seeker.plugin.processor
 
 import javassist.ClassPool
 

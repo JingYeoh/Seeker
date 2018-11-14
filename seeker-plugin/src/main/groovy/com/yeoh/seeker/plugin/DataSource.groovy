@@ -1,7 +1,7 @@
 package com.yeoh.seeker.plugin
 
 /**
- * 用于存储 SeekerExt 的配置和临时的一些缓存
+ * 用于存储 SeekerExtension 的配置和临时的一些缓存
  *
  * @author yangjing @ Zhihu Inc.
  * @since 2018-09-27

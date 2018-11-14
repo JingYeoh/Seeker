@@ -1,42 +1,98 @@
 package com.yeoh.seeker.plugin
 
+
+import com.yeoh.seeker.plugin.processor.MethodModifierProcessor
+import com.yeoh.seeker.plugin.processor.ReferencedClassProcessor
 import com.yeoh.seeker.plugin.utils.JarUtils
 import com.yeoh.seeker.plugin.utils.Log
+import javassist.ClassPool
 import org.apache.commons.io.FileUtils
 
+/**
+ * jar 包的注入类
+ *
+ * 过程
+ * * 1. 解析 jar 包
+ * * 2. 比对配置
+ * * 3. 调用代码注入器
+ * * 4. 重新打包
+ *
+ * @author Yeoh @ Zhihu Inc.
+ * @since 2018/11/13
+ */
 class JarInject {
 
     private static final int LOG_LEVEL = 2
-    private static boolean haveTarget = false
     private static final String GROUP = "JarInject"
+    private boolean haveTarget = false
 
-    static void injectJar(path) throws Exception {
-        Log.i(LOG_LEVEL, GROUP, "inject jar")
-        if (path.endsWith(".jar")) {
-            File jarFile = new File(path)
-            String jarZipDir = jarFile.getParent() + "/" + jarFile.getName().replace('.jar', '')
-            File unJar = new File(jarZipDir)
-            List classNameList = JarUtils.unJar(jarFile, unJar)
+    private final ClassPool mClassPool
+    private List<String> mJarPaths
 
-            try {
-                boolean haveTarget = traverseClassList(classNameList, jarZipDir)
-                if (haveTarget) {
-                    Log.i(LOG_LEVEL + 1, GROUP, "found jar target :" + jarZipDir)
-                    jarFile.delete()
-                    JarUtils.jar(jarFile, unJar)
-                } else {
-                    Log.i(LOG_LEVEL + 1, GROUP, "not found target class")
-                }
-            } catch (Exception e) {
-                throw e
-            } finally {
-                FileUtils.deleteDirectory(new File(jarZipDir))
-            }
+    JarInject(ClassPool pool) {
+        mClassPool = pool
+        mJarPaths = new ArrayList<>()
+    }
+
+    /**
+     * 添加 Jar 的路径
+     * @param path jar 路径
+     */
+    void appendJarPath(String path) {
+        if (!mJarPaths.contains(path)) {
+            mJarPaths.add(path)
         }
+    }
+
+    /**
+     * 开始注入
+     */
+    void inject() throws Exception {
+        MethodModifierProcessor.setClassPool(mClassPool)
+        ReferencedClassProcessor.setClassPool(mClassPool)
+        mJarPaths.forEach({
+            injectJar(it)
+        })
+    }
+
+    /**
+     * 修改 jar 包
+     * @param path jar 的路径
+     * @throws Exception 可能会抛出异常
+     */
+    private void injectJar(path) throws Exception {
+        Log.i(LOG_LEVEL, GROUP, "inject jar " + path)
+
+        File jarFile = new File(path)
+        String jarZipDir = jarFile.getParent() + "/" + jarFile.getName().replace('.jar', '')
+        File unJar = new File(jarZipDir)
+        List classNameList = JarUtils.unJar(jarFile, unJar)
+
+        try {
+            boolean haveTarget = traverseClassList(classNameList, jarZipDir)
+            if (haveTarget) {
+                Log.i(LOG_LEVEL + 1, GROUP, "found jar target :" + jarZipDir)
+                jarFile.delete()
+                JarUtils.jar(jarFile, unJar)
+            } else {
+                Log.i(LOG_LEVEL + 1, GROUP, "not found target class")
+            }
+        } catch (Exception e) {
+            throw e
+        } finally {
+            FileUtils.deleteDirectory(new File(jarZipDir))
+        }
+
         Log.ln(LOG_LEVEL, GROUP)
     }
 
-    private static boolean traverseClassList(List classNameList, String jarZipDir) {
+    /**
+     * 对比配置文件，调用代码注入器
+     * @param classNameList jar 包中的类集合
+     * @param jarZipDir jar zip 的目录
+     * @return 该 jar 包中是否注入代码
+     */
+    private boolean traverseClassList(List classNameList, String jarZipDir) {
         haveTarget = false
         for (String className : classNameList) {
             if (className.endsWith(".class")

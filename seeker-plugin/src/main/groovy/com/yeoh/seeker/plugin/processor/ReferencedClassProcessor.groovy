@@ -1,7 +1,6 @@
-package com.yeoh.seeker.plugin.v2
+package com.yeoh.seeker.plugin.processor
 
 import com.yeoh.seeker.plugin.DataSource
-import com.yeoh.seeker.plugin.SeekerProcessor
 import com.yeoh.seeker.plugin.utils.GenerateUtils
 import com.yeoh.seeker.plugin.utils.Log
 import javassist.CannotCompileException
@@ -16,7 +15,7 @@ import javassist.expr.NewExpr
  *
  * 修改调用逻辑，把原来的正常调用的方法换为生成的通过反射调用的方法.
  */
-class ReferencedClassProcessor2 extends SeekerProcessor {
+class ReferencedClassProcessor extends SeekerProcessor {
 
     private static final int LOG_LEVEL = 3
     static final String REF_DELEGATE_SUFFIX = "RefDelegate"
@@ -136,7 +135,7 @@ class ReferencedClassProcessor2 extends SeekerProcessor {
         // 通过 descriptor　获取方法参数中的类
         String descriptor = info.descriptor
         Log.i(LOG_LEVEL + 2, GROUP, "methodName = " + methodName)
-        CtMethod ctMethod = GenerateUtils.getMethod(ctClass, methodName, descriptor)
+        CtMethod ctMethod = GenerateUtils.getMethod(mClassPool, ctClass, methodName, descriptor)
         Log.i(LOG_LEVEL + 2, GROUP, "method = " + ctMethod)
 
         Log.i(LOG_LEVEL + 2, GROUP, "findInSeeker start...")
@@ -153,7 +152,7 @@ class ReferencedClassProcessor2 extends SeekerProcessor {
     }
 
     /**
-     * 在 SeekerExt 中寻找是否有匹配的类
+     * 在 SeekerExtension 中寻找是否有匹配的类
      * @param e 方法中创建新对象的代码，在此处进行替换为反射代理类
      * @param referencedClassName 含有 @Hide 注解的类名
      */
