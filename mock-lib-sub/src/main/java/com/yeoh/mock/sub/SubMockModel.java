@@ -1,7 +1,6 @@
 package com.yeoh.mock.sub;
 
 import android.content.Context;
-
 import com.yeoh.seeker.annotation.Hide;
 import com.yeoh.seeker.annotation.Modifier;
 
@@ -24,6 +23,6 @@ public class SubMockModel {
     }
 
     @Hide(Modifier.PROTECTED)
-    private void subMockTestMethod(int num, String name, Context context) {
+    void subMockTestMethod(int num, String name, Context context) {
     }
 }

@@ -16,13 +16,35 @@ import java.util.zip.ZipEntry;
 
 /**
  * Created by lizhaoxuan on 2017/12/31.
- *
+ * <p>
  * This class is copied from Intimate .
- *
+ * <p>
  * https://github.com/JustKiddingBaby/Intimate
  */
-
+// TODO: 2018/11/15 删除该类，替换为 groovy
 public class JarUtils {
+
+    /**
+     * 返回推荐的 jar　解压目录
+     *
+     * @param path jar　文件路径
+     *
+     * @return 解压的 jar　路径
+     */
+    public static String getExtractJarPath(String path) {
+        return getExtractJarPath(new File(path));
+    }
+
+    /**
+     * 返回推荐的 jar　解压目录
+     *
+     * @param jarFile jar　文件
+     *
+     * @return 解压的 jar　路径
+     */
+    public static String getExtractJarPath(File jarFile) {
+        return jarFile.getParent() + "/" + jarFile.getName().replace(".jar", "");
+    }
 
     public static void jar(File desJar, File jarDir) throws Exception {
         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(desJar));

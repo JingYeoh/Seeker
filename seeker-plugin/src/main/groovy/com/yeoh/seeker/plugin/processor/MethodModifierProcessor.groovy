@@ -1,20 +1,24 @@
-package com.yeoh.seeker.plugin
+package com.yeoh.seeker.plugin.processor
 
+import com.yeoh.seeker.plugin.DataSource
 import com.yeoh.seeker.plugin.utils.GenerateUtils
 import com.yeoh.seeker.plugin.utils.Log
 import com.yeoh.seeker.plugin.utils.ThrowExecutionError
 import javassist.CtClass
 import javassist.CtMethod
 import javassist.bytecode.AccessFlag
+import javassist.bytecode.AnnotationsAttribute
 import javassist.bytecode.Descriptor
 
 /**
- * 添加 @Hide 注解的方法的生成类.
- *
  * 修改方法的 modifier 为指定的 modifier.
+ *
+ * @author Yeoh @ Zhihu Inc.
+ * @since 2018/10/4
  */
-class MethodModifierProcessor {
+class MethodModifierProcessor extends SeekerProcessor {
 
+    private static final String ANNOTATION_HIDE = "com.yeoh.seeker.annotation.Hide"
     private static final int LOG_LEVEL = 3
     static final String GROUP = "MethodModifier"
 
@@ -39,8 +43,8 @@ class MethodModifierProcessor {
      * @param jarZipDir jar 的路径
      */
     private static void startProcess(String className, String jarZipDir) {
-        SeekerTransform.pool.appendClassPath(jarZipDir)
-        CtClass c = SeekerTransform.pool.getCtClass(className)
+        mClassPool.appendClassPath(jarZipDir)
+        CtClass c = mClassPool.getCtClass(className)
         if (c.isFrozen()) {
             c.defrost()
         }
@@ -48,7 +52,6 @@ class MethodModifierProcessor {
         doProcess(c)
 
         c.writeFile(jarZipDir)
-        SeekerTransform.jarClassList.add(c)
     }
     /**
      * 处理字节码
@@ -80,7 +83,7 @@ class MethodModifierProcessor {
     private static void processTargetMethod(CtClass c, def hideMethod) {
         Log.i(LOG_LEVEL + 1, GROUP, " start to change method: " + hideMethod.toString())
 
-        CtClass returns = SeekerTransform.pool.getCtClass(hideMethod.returns)
+        CtClass returns = mClassPool.getCtClass(hideMethod.returns)
         Log.i(LOG_LEVEL + 2, GROUP, "returns get success...")
 
         CtClass[] params = null
@@ -88,19 +91,29 @@ class MethodModifierProcessor {
             params = new CtClass[hideMethod.params.size()]
             for (int i = 0; i < params.length; i++) {
                 String className = hideMethod.params[i]
-                params[i] = SeekerTransform.pool.getCtClass(className)
+                params[i] = mClassPool.getCtClass(className)
             }
         }
         String descriptor = Descriptor.ofMethod(returns, params)
         Log.i(LOG_LEVEL + 2, GROUP, "descriptor get success...")
 
-        CtMethod ctMethod = GenerateUtils.getMethod(c, hideMethod.methodName, descriptor)
+        CtMethod ctMethod = GenerateUtils.getMethod(mClassPool, c, hideMethod.methodName, descriptor)
         if (ctMethod == null) {
             ThrowExecutionError.throwError(c.name + " not found method:  " + hideMethod.methodName)
         }
         // 改变 modifier 的值
         GenerateUtils.changeModifier(ctMethod, hideMethod.modifier)
         Log.i(LOG_LEVEL + 1, GROUP, c.name + "#" + hideMethod.methodName + " modifier changed to " + hideMethod.modifier)
-        // TODO: 删除 @Hide Annotation
+        // 删除 @Hide 注解
+        ctMethod.methodInfo.attributes.forEach({
+            if (it instanceof AnnotationsAttribute) {
+                for (annotation in it.getAnnotations()) {
+                    if (annotation.getTypeName() == ANNOTATION_HIDE) {
+                        it.removeAnnotation(ANNOTATION_HIDE)
+                        Log.i(LOG_LEVEL + 1, GROUP, c.name + " has removed @Hide")
+                    }
+                }
+            }
+        })
     }
 }

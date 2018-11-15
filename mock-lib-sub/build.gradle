@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
+apply plugin: 'seeker-plugin'
 
 def ext = rootProject.ext
 
@@ -33,7 +34,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(':mock-lib')
+//    implementation project(path: ':mock-lib', configuration: 'default')
+//    implementation project(':mock-lib')
     implementation project(':seeker')
     annotationProcessor project(':seeker-processer')
 }
@@ -47,4 +49,9 @@ uploadArchives {
             repository(url: uri('../repo'))
         }
     }
+}
+
+seeker{
+    enable = true
+    debugEnable = true
 }

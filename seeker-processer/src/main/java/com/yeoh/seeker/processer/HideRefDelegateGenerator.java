@@ -86,12 +86,24 @@ class HideRefDelegateGenerator {
                 }
             } else {
                 if (GeneratorUtils.isVoid(hideMethod.returns)) {
-                    methodBuilder.addStatement("invokeMethod("
-                            + buildInvokeMethod(hideMethod) + ", $N)", HideMethod.class, methodArgs);
+                    // 如果只有一个参数并且该参数为可变长度，则需要特殊处理
+                    if (hideMethod.params.length > 1 || !hideMethod.params[0].endsWith("[]")) {
+                        methodBuilder.addStatement("invokeMethod("
+                                + buildInvokeMethod(hideMethod) + ", $N)", HideMethod.class, methodArgs);
+                    } else {
+                        methodBuilder.addStatement("invokeMethodForVarArgs("
+                                + buildInvokeMethod(hideMethod) + ", $N)", HideMethod.class, methodArgs);
+                    }
                 } else {
-                    methodBuilder.addStatement("return" + " (" + hideMethod.returns + ") "
-                                    + "invokeMethod(" + buildInvokeMethod(hideMethod) + ", $N)",
-                            HideMethod.class, methodArgs);
+                    if (hideMethod.params.length > 1 || !hideMethod.params[0].endsWith("[]")) {
+                        methodBuilder.addStatement("return" + " (" + hideMethod.returns + ") "
+                                        + "invokeMethod(" + buildInvokeMethod(hideMethod) + ", $N)",
+                                HideMethod.class, methodArgs);
+                    } else {
+                        methodBuilder.addStatement("return" + " (" + hideMethod.returns + ") "
+                                        + "invokeMethodForVarArgs(" + buildInvokeMethod(hideMethod) + ", $N)",
+                                HideMethod.class, methodArgs);
+                    }
                 }
             }
             moduleBuilder.addMethod(methodBuilder.build());

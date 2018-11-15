@@ -6,6 +6,7 @@ dependencies {
     implementation localGroovy()
     implementation 'com.android.tools.build:gradle:3.1.4'
     implementation 'org.javassist:javassist:3.24.0-GA'
+    implementation 'org.jooq:joor:0.9.6'
 //    implementation project(':seeker')
 }
 
