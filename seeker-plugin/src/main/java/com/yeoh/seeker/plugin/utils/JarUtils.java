@@ -21,13 +21,14 @@ import java.util.zip.ZipEntry;
  * <p>
  * https://github.com/JustKiddingBaby/Intimate
  */
-
+// TODO: 2018/11/15 删除该类，替换为 groovy
 public class JarUtils {
 
     /**
      * 返回推荐的 jar　解压目录
      *
      * @param path jar　文件路径
+     *
      * @return 解压的 jar　路径
      */
     public static String getExtractJarPath(String path) {
@@ -38,6 +39,7 @@ public class JarUtils {
      * 返回推荐的 jar　解压目录
      *
      * @param jarFile jar　文件
+     *
      * @return 解压的 jar　路径
      */
     public static String getExtractJarPath(File jarFile) {
@@ -76,7 +78,7 @@ public class JarUtils {
         } else {
             prefix = "";
         }
-        for (File f : src) {
+        for (File f: src) {
             jar(f, prefix, jout);
         }
         jout.close();
@@ -94,7 +96,7 @@ public class JarUtils {
             jout.closeEntry();
             File[] files = src.listFiles();
             if (files != null) {
-                for (File file : files) {
+                for (File file: files) {
                     jar(file, prefix, jout);
                 }
             }
