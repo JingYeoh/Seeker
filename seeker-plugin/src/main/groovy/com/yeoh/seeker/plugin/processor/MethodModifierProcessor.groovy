@@ -7,6 +7,7 @@ import com.yeoh.seeker.plugin.utils.ThrowExecutionError
 import javassist.CtClass
 import javassist.CtMethod
 import javassist.bytecode.AccessFlag
+import javassist.bytecode.AnnotationsAttribute
 import javassist.bytecode.Descriptor
 
 /**
@@ -16,6 +17,7 @@ import javassist.bytecode.Descriptor
  */
 class MethodModifierProcessor extends SeekerProcessor {
 
+    private static final String ANNOTATION_HIDE = "com.yeoh.seeker.annotation.Hide"
     private static final int LOG_LEVEL = 3
     static final String GROUP = "MethodModifier"
 
@@ -101,6 +103,16 @@ class MethodModifierProcessor extends SeekerProcessor {
         // 改变 modifier 的值
         GenerateUtils.changeModifier(ctMethod, hideMethod.modifier)
         Log.i(LOG_LEVEL + 1, GROUP, c.name + "#" + hideMethod.methodName + " modifier changed to " + hideMethod.modifier)
-        // TODO: 删除 @Hide Annotation
+        // 删除 @Hide 注解
+        ctMethod.methodInfo.attributes.forEach({
+            if (it instanceof AnnotationsAttribute) {
+                for (annotation in it.getAnnotations()) {
+                    if (annotation.getTypeName() == ANNOTATION_HIDE) {
+                        it.removeAnnotation(ANNOTATION_HIDE)
+                        Log.i(LOG_LEVEL + 1, GROUP, c.name + " has removed @Hide")
+                    }
+                }
+            }
+        })
     }
 }
