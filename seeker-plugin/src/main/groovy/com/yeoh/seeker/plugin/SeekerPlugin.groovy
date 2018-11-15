@@ -50,14 +50,14 @@ class SeekerPlugin implements Plugin<Project> {
         }
 
         // 上传完毕后删除临时目录
-        Task upload = mProject.tasks.findByName("uploadArchives")
-        if (upload != null) {
-            upload.doLast {
-                DataSource.TEMP_DIRS.forEach({
-                    "rm -rf ${it}".execute()
-                })
-            }
-        }
+//        Task upload = mProject.tasks.findByName("uploadArchives")
+//        if (upload != null) {
+//            upload.doLast {
+//                DataSource.TEMP_DIRS.forEach({
+//                    "rm -rf ${it}".execute()
+//                })
+//            }
+//        }
     }
 
     /**

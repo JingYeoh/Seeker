@@ -61,14 +61,14 @@ class VariantProcessor {
                 Log.i(LEVEL + 1, GROUP, "dustDir = " + dustDir)
             }
         } else {
-            String taskPath = 'transformClassesAndResourcesWithSyncLibJarsFor' + mVariant.name.capitalize()
+            String taskPath = 'bundle' + mVariant.name.capitalize()
             Task syncLibTask = mProject.tasks.findByPath(taskPath)
             if (syncLibTask == null) {
                 throw new RuntimeException("Can not find task ${taskPath}!")
             }
-            syncLibTask.doLast {
-                configureClassPool()
+            syncLibTask.doFirst {
                 configureSeeker()
+                configureClassPool()
                 File dustDir = mProject.file(mProject.buildDir.path + '/intermediates/packaged-classes/' + mVariant.dirName)
                 Log.i(LEVEL + 1, GROUP, "outputDir = " + dustDir)
                 processJars(dustDir)
@@ -83,6 +83,10 @@ class VariantProcessor {
         //　解析依赖的第三方库
         DataSource.DEPENDENCIES_PATH.forEach({
             File file = new File(it)
+            if (!file.exists()) {
+                Log.i(LEVEL + 1, GROUP, "can not find file " + it)
+                return
+            }
             if (file.path.endsWith("aar")) {
                 String extractPath = AarUtils.getExtractAarPath(file)
                 DataSource.TEMP_DIRS.add(extractPath)

@@ -1,6 +1,9 @@
 package com.yeoh.seeker.plugin.utils
 /**
  * aar 的帮助类，用于解压、重新压缩等
+ *
+ * @author Yeoh @ Zhihu Inc.
+ * @since 2018/11/14
  */
 class AarUtils {
 
@@ -47,20 +50,18 @@ class AarUtils {
         }
         Aar aar = new Aar()
         aar.rootPath = file.path
-        //1. 复制文件并重命名 .aar 后缀变为 .zip 后缀
-        String aarName = file.name.replace(".aar", '')
-        String copyPath = "${unAarDir.path}/${aarName}.zip"
-        String copy = "cp ${file.path} ${copyPath}"
-        copy.execute()
-        Log.i(LEVEL, GROUP, "execute ${copy}")
-        //2. 解压
-        File zipAar = new File("${copyPath}")
-        String unZip = "unzip -o ${zipAar.path} -d ${zipAar.getParent()}"
-        unZip.execute().waitFor()
-        Log.i(LEVEL, GROUP, "execute ${unZip}")
-        //3. 取出相应的信息
-        aar.jarPath = "${zipAar.getParent()}/classes.jar"
-        //4. 解压 jar　包
+
+        // 1. 解压 aar
+        ZipUtils.unZip(file, unAarDir)
+
+        // 2. 取出相应的信息
+        unAarDir.eachFile {
+            if (it.path.endsWith(".jar")) {
+                aar.jarPath = it.path
+            }
+        }
+
+        // 3. 解压 jar　包
         String extractJarPath = JarUtils.getExtractJarPath(aar.jarPath)
         JarUtils.unJar(new File(aar.jarPath), new File(extractJarPath))
         aar.extractJarPath = extractJarPath
