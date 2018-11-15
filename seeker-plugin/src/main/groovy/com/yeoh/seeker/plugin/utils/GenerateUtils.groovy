@@ -9,6 +9,12 @@ import javassist.bytecode.AccessFlag
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+/**
+ * 修改字节码文件的帮助类
+ *
+ * @author Yeoh @ Zhihu Inc.
+ * @since 2018/10/4
+ */
 class GenerateUtils {
 
     static final String GROUP = "GenerateUtils"

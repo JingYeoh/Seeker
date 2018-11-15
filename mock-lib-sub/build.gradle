@@ -34,7 +34,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(path: ':mock-lib', configuration: 'default')
+//    implementation project(path: ':mock-lib', configuration: 'default')
 //    implementation project(':mock-lib')
     implementation project(':seeker')
     annotationProcessor project(':seeker-processer')

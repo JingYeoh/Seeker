@@ -12,8 +12,10 @@ import javassist.expr.NewExpr
 
 /**
  * 用于修改「调用添加 @Hide 注解的方法」的类.
- *
  * 修改调用逻辑，把原来的正常调用的方法换为生成的通过反射调用的方法.
+ *
+ * @author Yeoh @ Zhihu Inc.
+ * @since 2018/10/4
  */
 class ReferencedClassProcessor extends SeekerProcessor {
 
