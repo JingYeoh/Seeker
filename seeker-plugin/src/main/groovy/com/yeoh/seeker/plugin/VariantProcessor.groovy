@@ -80,6 +80,7 @@ class VariantProcessor {
      * 配置 ClassPool，注入依赖的库到 ClassPool 中
      */
     private void configureClassPool() {
+        mClassPool.clearImportedPackages()
         //　解析依赖的第三方库
         DataSource.DEPENDENCIES_PATH.forEach({
             File file = new File(it)

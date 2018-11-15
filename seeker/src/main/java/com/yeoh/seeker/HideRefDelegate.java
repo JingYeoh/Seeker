@@ -32,6 +32,17 @@ public class HideRefDelegate {
         return null;
     }
 
+    protected Object invokeMethodForVarArgs(Method method, Object arg) {
+        try {
+            return method.invoke(object, (Object) arg);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     protected Method reflectMethod(HideMethod hideMethod) {
         Method method = HideRefFactory.getMethod(mClass, hideMethod);
         try {

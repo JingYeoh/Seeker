@@ -3,8 +3,6 @@ package com.yeoh.seeker.plugin
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.yeoh.seeker.plugin.extension.SeekerExtension
-import com.yeoh.seeker.plugin.utils.AarUtils
-import com.yeoh.seeker.plugin.utils.JarUtils
 import com.yeoh.seeker.plugin.utils.Log
 import javassist.ClassPool
 import javassist.NotFoundException
@@ -50,14 +48,14 @@ class SeekerPlugin implements Plugin<Project> {
         }
 
         // 上传完毕后删除临时目录
-//        Task upload = mProject.tasks.findByName("uploadArchives")
-//        if (upload != null) {
-//            upload.doLast {
-//                DataSource.TEMP_DIRS.forEach({
-//                    "rm -rf ${it}".execute()
-//                })
-//            }
-//        }
+        Task upload = mProject.tasks.findByName("uploadArchives")
+        if (upload != null) {
+            upload.doLast {
+                DataSource.TEMP_DIRS.forEach({
+                    "rm -rf ${it}".execute()
+                })
+            }
+        }
     }
 
     /**
