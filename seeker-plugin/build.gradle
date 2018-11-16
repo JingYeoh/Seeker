@@ -1,5 +1,6 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: 'com.novoda.bintray-release'
 
 dependencies {
     implementation gradleApi()
@@ -7,15 +8,15 @@ dependencies {
     implementation 'com.android.tools.build:gradle:3.1.4'
     implementation 'org.javassist:javassist:3.24.0-GA'
     implementation 'org.jooq:joor:0.9.6'
-//    implementation project(':seeker')
 }
 
 repositories {
     mavenCentral()
 }
 
-group = 'com.yeoh.plugin'
+group = seeker.groupId
 version = '0.0.1'
+archivesBaseName = 'seeker-plugin'
 
 uploadArchives {
     repositories {
@@ -23,4 +24,13 @@ uploadArchives {
             repository(url: uri('../repo'))
         }
     }
+}
+
+publish {
+    userOrg = seeker.userOrg
+    groupId = group
+    artifactId = archivesBaseName
+    publishVersion = "0.0.1"
+    desc = seeker.desc
+    website = seeker.website
 }

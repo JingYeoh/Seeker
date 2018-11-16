@@ -1,17 +1,15 @@
 apply plugin: 'com.android.application'
 
-def ext = rootProject.ext
-
 android {
-    compileSdkVersion ext.android.compileSdkVersion
-    buildToolsVersion ext.android.buildToolsVersion
+    compileSdkVersion versions.compileSDK
+    buildToolsVersion versions.buildTool
 
     defaultConfig {
-        applicationId ext.app.applicationId
-        minSdkVersion ext.android.minSdkVersion
-        targetSdkVersion ext.android.targetSdkVersion
-        versionCode ext.app.targetSdkVersion
-        versionName ext.app.versionName
+        applicationId app.applicationId
+        minSdkVersion versions.minSDK
+        targetSdkVersion versions.targetSDK
+        versionCode 1
+        versionName "0.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -33,11 +31,13 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    implementation ext.dependencies.appcompatV7
-    implementation ext.dependencies.constraintLayout
-    testImplementation ext.dependencies.junit
-    androidTestImplementation ext.dependencies.testRunner
-    androidTestImplementation ext.dependencies.testEspressoXore
+    implementation "com.android.support:appcompat-v7:${versions.appcompat_V7}"
+    implementation "com.android.support.constraint:constraint-layout:${versions.constraintLayout}"
+    testImplementation "junit:junit:${versions.junit}"
+    androidTestImplementation "com.android.support.test:runner:${versions.testRunner}"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:${versions.testEspressoXore}"
+    implementation 'com.justkiddingbaby:fragment-rigger:1.4.3'
+
 
     implementation project(":seeker")
 }

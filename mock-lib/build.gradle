@@ -2,17 +2,15 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 apply plugin: 'seeker-plugin'
 
-def ext = rootProject.ext
-
 android {
-    compileSdkVersion ext.android.compileSdkVersion
-    buildToolsVersion ext.android.buildToolsVersion
+    compileSdkVersion versions.compileSDK
+    buildToolsVersion versions.buildTool
 
     defaultConfig {
-        minSdkVersion ext.android.minSdkVersion
-        targetSdkVersion ext.android.targetSdkVersion
-        versionCode ext.app.targetSdkVersion
-        versionName ext.app.versionName
+        minSdkVersion versions.minSDK
+        targetSdkVersion versions.targetSDK
+        versionCode 1
+        versionName "0.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -31,10 +29,21 @@ android {
     }
 }
 
+// 打包源码jar
+//task sourcesJar(type: Jar) {
+//    from android.sourceSets.main.java.srcDirs
+//    classifier = 'sources'
+//}
+
+//artifacts {
+//    archives sourcesJar
+//}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation project(':seeker')
+//    implementation "com.yeoh:seeker:${ext.versions.seeker}"
     annotationProcessor project(':seeker-processer')
 }
 
@@ -47,13 +56,9 @@ uploadArchives {
             repository(url: uri('../repo'))
         }
     }
-}.doFirst {
-    println 'print before upLoadArchives'
-}.doLast {
-    println 'print after upLoadArchives'
 }
 
-seeker{
-    enable = true
-    debugEnable = true
-}
+//seeker {
+//    enable = true
+//    debugEnable = true
+//}

@@ -1,5 +1,6 @@
 apply plugin: 'java-library'
 apply plugin: 'maven'
+apply plugin: 'com.novoda.bintray-release'
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -12,8 +13,9 @@ dependencies {
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
-group = 'com.yeoh.seeker'
+group = seeker.groupId
 version = '0.0.1'
+archivesBaseName = 'seeker-processor'
 
 uploadArchives {
     repositories {
@@ -21,4 +23,13 @@ uploadArchives {
             repository(url: uri('../repo'))
         }
     }
+}
+
+publish {
+    userOrg = seeker.userOrg
+    groupId = group
+    artifactId = archivesBaseName
+    publishVersion = "0.0.1"
+    desc = seeker.desc
+    website = seeker.website
 }

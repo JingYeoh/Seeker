@@ -1,17 +1,18 @@
 apply plugin: 'java-library'
 apply plugin: 'maven'
+apply plugin: 'com.novoda.bintray-release'
 
-def ext = rootProject.ext
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    api ext.dependencies.supportAnnotations
+    api "com.android.support:support-annotations:${versions.supportAnnotations}"
 }
 
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
-group = 'com.yeoh.seeker'
+group = seeker.groupId
 version = '0.0.1'
+archivesBaseName = 'seeker-annotation'
 
 uploadArchives {
     repositories {
@@ -19,4 +20,13 @@ uploadArchives {
             repository(url: uri('../repo'))
         }
     }
+}
+
+publish {
+    userOrg = seeker.userOrg
+    groupId = group
+    artifactId = archivesBaseName
+    publishVersion = "0.0.1"
+    desc = seeker.desc
+    website = seeker.website
 }
