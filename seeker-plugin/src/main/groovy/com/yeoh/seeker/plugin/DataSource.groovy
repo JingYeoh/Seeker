@@ -16,6 +16,8 @@ class DataSource {
     static Set<String> DEPENDENCIES_JARS_PATH = new HashSet<>()
     // 依赖的第三方库
     static Set<String> DEPENDENCIES_PATH = []
+    // 用于存储源码路径的集合
+    static Set SOURCE_PATHS = []
 
     def static clear() {
         seekerConfig = [:]

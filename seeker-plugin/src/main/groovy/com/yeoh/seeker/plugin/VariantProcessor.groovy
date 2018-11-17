@@ -34,7 +34,7 @@ class VariantProcessor {
     /**
      * 处理 variant
      */
-    void processVariant() {
+    void process() {
 //        String taskPath = 'prepare' + mVariant.name.capitalize() + 'Dependencies'
 //        Task prepareTask = mProject.tasks.findByPath(taskPath)
 //        if (prepareTask == null) {

@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
-apply plugin: 'seeker-plugin'
+//apply plugin: 'seeker-plugin'
 
 android {
     compileSdkVersion versions.compileSDK
@@ -30,14 +30,16 @@ android {
 }
 
 // 打包源码jar
-//task sourcesJar(type: Jar) {
-//    from android.sourceSets.main.java.srcDirs
-//    classifier = 'sources'
-//}
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    // .../java
+    // .../temp/java
+    classifier = 'sources'
+}
 
-//artifacts {
-//    archives sourcesJar
-//}
+artifacts {
+    archives sourcesJar
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -61,4 +63,5 @@ uploadArchives {
 //seeker {
 //    enable = true
 //    debugEnable = true
+//    trickIDEA = true
 //}
