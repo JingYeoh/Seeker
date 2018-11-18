@@ -1,4 +1,4 @@
-package com.yeoh.seeker.plugin.processor
+package com.yeoh.seeker.plugin.processor.bytecode
 
 import com.yeoh.seeker.plugin.DataSource
 import com.yeoh.seeker.plugin.utils.GenerateUtils
@@ -16,7 +16,7 @@ import javassist.bytecode.Descriptor
  * @author Yeoh @ Zhihu Inc.
  * @since 2018/10/4
  */
-class MethodModifierProcessor extends SeekerProcessor {
+class MethodModifierProcessor extends BytecodeProcessor {
 
     private static final String ANNOTATION_HIDE = "com.yeoh.seeker.annotation.Hide"
     private static final int LOG_LEVEL = 3

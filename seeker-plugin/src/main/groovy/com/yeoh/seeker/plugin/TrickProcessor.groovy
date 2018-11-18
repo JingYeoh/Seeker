@@ -1,5 +1,6 @@
 package com.yeoh.seeker.plugin
 
+import com.yeoh.seeker.plugin.processor.java.SourceCodeProcessor
 import com.yeoh.seeker.plugin.utils.Log
 import com.yeoh.seeker.plugin.utils.ThrowExecutionError
 import org.gradle.api.Project
@@ -20,8 +21,8 @@ class TrickProcessor {
 
     private static String TEMP_SOURCES_ROOT = "build/Seeker/sources/"
 
-    private Set<String> mHookSourcesPath = []
-    private Set<String> mSourcesPath = []
+    private Set mHookSourcesPath = []
+    private Set mSourcesPath = []
 
     TrickProcessor(Project project) {
         mProject = project
@@ -113,6 +114,7 @@ class TrickProcessor {
     private void hookSources() {
         Log.i(LEVEL + 1, GROUP, "hookSources")
         copySourcesToHookSources()
+        hookSourcesFiles()
     }
 
     /**
@@ -158,5 +160,15 @@ class TrickProcessor {
             }
         }
         Log.i(LEVEL + 1, GROUP, "copySourcesToHookSources done...")
+    }
+
+    /**
+     * hook java　源码
+     */
+    private void hookSourcesFiles() {
+        mHookSourcesPath.forEach({
+            SourceCodeProcessor processor = new SourceCodeProcessor(it)
+            processor.process()
+        })
     }
 }

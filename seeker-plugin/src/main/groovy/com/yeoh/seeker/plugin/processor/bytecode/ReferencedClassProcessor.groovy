@@ -1,4 +1,4 @@
-package com.yeoh.seeker.plugin.processor
+package com.yeoh.seeker.plugin.processor.bytecode
 
 import com.yeoh.seeker.plugin.DataSource
 import com.yeoh.seeker.plugin.utils.GenerateUtils
@@ -17,7 +17,7 @@ import javassist.expr.NewExpr
  * @author Yeoh @ Zhihu Inc.
  * @since 2018/10/4
  */
-class ReferencedClassProcessor extends SeekerProcessor {
+class ReferencedClassProcessor extends BytecodeProcessor {
 
     private static final int LOG_LEVEL = 3
     static final String REF_DELEGATE_SUFFIX = "RefDelegate"
