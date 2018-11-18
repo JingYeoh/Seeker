@@ -18,7 +18,7 @@ class TrickProcessor {
     private final Project mProject
     private Task mSourcesJar
 
-    private static final String TEMP_SOURCES_ROOT = "./build/Seeker/sources/"
+    private static String TEMP_SOURCES_ROOT = "build/Seeker/sources/"
 
     private Set<String> mHookSourcesPath = []
     private Set<String> mSourcesPath = []
@@ -33,9 +33,11 @@ class TrickProcessor {
     void process() {
         Log.i(LEVEL, GROUP, "----------- TrickProcessor -----------")
         File rootHookSources = new File(TEMP_SOURCES_ROOT)
-        if (rootHookSources.exists()) {
+        if (!rootHookSources.exists()) {
             rootHookSources.mkdir()
         }
+        TEMP_SOURCES_ROOT = rootHookSources.absolutePath
+        Log.i(LEVEL, GROUP, TEMP_SOURCES_ROOT)
         resolveSourcesJar()
         hookSourcesJarTask()
         processSources()
@@ -78,7 +80,7 @@ class TrickProcessor {
                     def tempSourcePath = getTempSourcePath(innerIt)
                     innerDir.add(tempSourcePath)
                     // 添加至临时文件夹中，执行完毕后需要删除临时文件夹
-                    mHookSourcesPath.add(tempSourcePath)
+                    mHookSourcesPath.add(innerDir)
                 }
                 mSourcesJar.mainSpec.sourcePaths.add(innerDir)
             } else if (it as String) {
@@ -89,8 +91,7 @@ class TrickProcessor {
             }
         })
         Log.i(LEVEL + 1, GROUP, "hookSourcesJarTask success")
-        Log.i(LEVEL + 2, GROUP, mSourcesJar.mainSpec.sourcePaths)
-        Log.i(LEVEL + 2, GROUP, "hook sources = ${mHookSourcesPath}")
+        Log.i(LEVEL + 2, GROUP, "sources path changed to: ${mSourcesJar.mainSpec.sourcePaths}")
     }
 
     /**
@@ -133,7 +134,7 @@ class TrickProcessor {
     private String getTempSourcePath(def path) {
         path = path.toString()
         String[] arr = path.split("/")
-        return "${TEMP_SOURCES_ROOT}${arr[arr.length - 1]}"
+        return "${TEMP_SOURCES_ROOT}/${arr[arr.length - 1]}"
     }
 
     /**
