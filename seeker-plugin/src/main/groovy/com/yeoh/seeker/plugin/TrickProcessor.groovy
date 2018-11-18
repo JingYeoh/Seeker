@@ -3,6 +3,7 @@ package com.yeoh.seeker.plugin
 import com.yeoh.seeker.plugin.utils.Log
 import com.yeoh.seeker.plugin.utils.ThrowExecutionError
 import org.gradle.api.Project
+import org.gradle.api.Task
 
 /**
  * 处理 Java 源代码的处理器，hook 了 sourcesJar plugin 并 hook 了相关的 java 代码
@@ -15,9 +16,12 @@ class TrickProcessor {
     private static final int LEVEL = 2
     private static final String GROUP = "TrickProcessor"
     private final Project mProject
-    private def mSourcesJar
+    private Task mSourcesJar
 
     private static final String TEMP_SOURCES_ROOT = "./build/Seeker/sources/"
+
+    private Set<String> mHookSourcesPath = []
+    private Set<String> mSourcesPath = []
 
     TrickProcessor(Project project) {
         mProject = project
@@ -28,6 +32,10 @@ class TrickProcessor {
      */
     void process() {
         Log.i(LEVEL, GROUP, "----------- TrickProcessor -----------")
+        File rootHookSources = new File(TEMP_SOURCES_ROOT)
+        if (rootHookSources.exists()) {
+            rootHookSources.mkdir()
+        }
         resolveSourcesJar()
         hookSourcesJarTask()
         processSources()
@@ -46,7 +54,15 @@ class TrickProcessor {
         Log.i(LEVEL + 1, GROUP, "find sourcesJar plugin")
         mSourcesJar.mainSpec.sourcePaths.forEach {
             Log.i(LEVEL + 1, GROUP, "source path = ${it}")
-            DataSource.SOURCE_PATHS.add(it)
+            if (it as String) {
+                mSourcesPath.add(it)
+            } else if (it as Collection) {
+                Set<String> innerSources = []
+                it.forEach { innerIt ->
+                    innerSources.add(innerIt)
+                }
+                mSourcesPath.add(innerSources)
+            }
         }
     }
 
@@ -54,41 +70,27 @@ class TrickProcessor {
      * hook sourcesJar task 并替换 from 路径
      */
     private void hookSourcesJarTask() {
-        Log.i(LEVEL + 1, GROUP, "hookSourcesJarTask")
-        DataSource.SOURCE_PATHS.forEach({
+        mSourcesPath.forEach({
             mSourcesJar.mainSpec.sourcePaths.remove(it)
-            if (it as String) {
-
-            }
-            if (it.startsWith("[") && it.endsWith("]")) {
+            if (it as Collection) {
                 Set<String> innerDir = []
                 it.forEach { innerIt ->
-                    def tempSourcePath = getTempSourcePath(it)
+                    def tempSourcePath = getTempSourcePath(innerIt)
                     innerDir.add(tempSourcePath)
                     // 添加至临时文件夹中，执行完毕后需要删除临时文件夹
-                    DataSource.TEMP_DIRS.add(tempSourcePath)
+                    mHookSourcesPath.add(tempSourcePath)
                 }
                 mSourcesJar.mainSpec.sourcePaths.add(innerDir)
-            } else {
+            } else if (it as String) {
                 def tempSourcePath = getTempSourcePath(it)
                 mSourcesJar.mainSpec.sourcePaths.add(tempSourcePath)
                 // 添加至临时文件夹中，执行完毕后需要删除临时文件夹
-                DataSource.TEMP_DIRS.add(tempSourcePath)
+                mHookSourcesPath.add(tempSourcePath)
             }
         })
-//        tempDirs.forEach {
-//            // hook sourcesJar 中的配置
-//            mSourcesJar.mainSpec.sourcePaths.add(it)
-//            // 添加至临时文件夹中，执行完毕后需要删除临时文件夹
-//            if (it.startsWith("[") && it.endsWith("]")) {
-//                it.forEach { innerIt ->
-//                    DataSource.TEMP_DIRS.add(innerDir)
-//                }
-//            } else {
-//                DataSource.TEMP_DIRS.add(it)
-//            }
-//        }
-        Log.i(LEVEL + 2, GROUP, sourcesJar.mainSpec.sourcePaths)
+        Log.i(LEVEL + 1, GROUP, "hookSourcesJarTask success")
+        Log.i(LEVEL + 2, GROUP, mSourcesJar.mainSpec.sourcePaths)
+        Log.i(LEVEL + 2, GROUP, "hook sources = ${mHookSourcesPath}")
     }
 
     /**
@@ -98,22 +100,29 @@ class TrickProcessor {
         mSourcesJar.doFirst {
             hookSources()
         }.doLast {
-            deleteTempDir()
+            deleteHookSourcesDir()
         }
     }
 
     /**
      * hook source 文件夹
+     * 1. 复制原本的 Sources 文件到 hookSources　中
+     * 2. hook java 源代码
      */
     private void hookSources() {
-
+        Log.i(LEVEL + 1, GROUP, "hookSources")
+        copySourcesToHookSources()
     }
 
     /**
-     * 删除临时文件夹
+     * 删除 hook 的临时文件夹
      */
-    private void deleteTempDir() {
-
+    private void deleteHookSourcesDir() {
+        Log.i(LEVEL + 1, GROUP, "deleteHookSourcesDir")
+        mHookSourcesPath.forEach({
+//            "rm -rf ${it}".execute()
+        })
+        mHookSourcesPath.clear()
     }
 
     /**
@@ -121,8 +130,32 @@ class TrickProcessor {
      * @param path 原路径
      * @return 新的路径
      */
-    private String getTempSourcePath(String path) {
-        String[] strs = path.split("/")
-        return "${TEMP_SOURCES_ROOT}${strs[strs.length - 1]}"
+    private String getTempSourcePath(def path) {
+        path = path.toString()
+        String[] arr = path.split("/")
+        return "${TEMP_SOURCES_ROOT}${arr[arr.length - 1]}"
+    }
+
+    /**
+     * 复制 sources 到 hook　sources 文件夹
+     */
+    private void copySourcesToHookSources() {
+        for (int i = 0; i < mSourcesPath.size(); i++) {
+            def source = mSourcesPath[i]
+            if (source as Collection) {
+                for (int j = 0; j < source.size(); j++) {
+                    mProject.copy {
+                        from(source)
+                        into(mHookSourcesPath[i][j])
+                    }
+                }
+            } else if (source as String) {
+                mProject.copy {
+                    from(source)
+                    into(mHookSourcesPath[i])
+                }
+            }
+        }
+        Log.i(LEVEL + 1, GROUP, "copySourcesToHookSources done...")
     }
 }

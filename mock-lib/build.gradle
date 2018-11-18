@@ -1,6 +1,13 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
-//apply plugin: 'seeker-plugin'
+apply plugin: 'seeker-plugin'
+
+seeker {
+    enable = true
+    debugEnable = true
+    trickIDEA = true
+    hookClass = false
+}
 
 android {
     compileSdkVersion versions.compileSDK
@@ -59,9 +66,3 @@ uploadArchives {
         }
     }
 }
-
-//seeker {
-//    enable = true
-//    debugEnable = true
-//    trickIDEA = true
-//}
