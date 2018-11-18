@@ -39,8 +39,6 @@ android {
 // 打包源码jar
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    // .../java
-    // .../temp/java
     classifier = 'sources'
 }
 

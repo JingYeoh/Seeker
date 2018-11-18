@@ -4,9 +4,9 @@ apply plugin: 'com.novoda.bintray-release'
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.squareup:javapoet:1.9.0'
-    implementation 'com.google.auto.service:auto-service:1.0-rc3'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation "com.squareup:javapoet:${versions.javapoet}"
+    implementation "com.google.auto.service:auto-service:${versions.autoSerivice}"
+    implementation "com.google.code.gson:gson:${versions.gson}"
     implementation project(':seeker')
 }
 
