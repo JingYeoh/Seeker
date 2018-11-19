@@ -71,6 +71,14 @@ class SourceCodeProcessor {
     private void hookJavaSourceCode(File javaPath) {
         Log.i(LEVEL + 1, GROUP, "hook java source ${javaPath}")
         CompilationUnit compilationUnit = JavaParser.parse(javaPath)
+        // hook method body
+        JavaReferencedClassParser referencedClassParser = new JavaMethodModifierParser(compilationUnit, javaPath)
+        referencedClassParser.hook()
+        // hook method modifier
+        JavaMethodModifierParser methodModifierParser = new JavaMethodModifierParser(compilationUnit, javaPath)
+        methodModifierParser.hook()
+
+        // todo: 移动下面代码到 JavaMethodModifierParser　中
         compilationUnit.findAll(MethodDeclaration.class).stream()
                 .forEach(new Consumer<MethodDeclaration>() {
             @Override
