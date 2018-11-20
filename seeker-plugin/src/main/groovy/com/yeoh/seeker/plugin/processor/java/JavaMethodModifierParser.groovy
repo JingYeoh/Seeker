@@ -4,7 +4,6 @@ import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.Modifier
 import com.github.javaparser.ast.Node
 import com.github.javaparser.ast.body.MethodDeclaration
-import com.github.javaparser.ast.expr.AnnotationExpr
 import com.yeoh.seeker.plugin.DataSource
 import com.yeoh.seeker.plugin.utils.Log
 
@@ -129,20 +128,12 @@ class JavaMethodModifierParser extends BaseJavaParser {
         def annotations = methodDeclaration.getAnnotations()
         for (int i = 0; i < annotations.size(); i++) {
             def annotationExpr = annotations.get(i)
-            if (isHideAnnotation(annotationExpr)) {
+            annotationExpr.lis
+            if (annotationExpr.nameAsString == DataSource.ANNOTATION_HIDE) {
                 hasHideAnnotation = true
                 break
             }
         }
         return hasHideAnnotation
-    }
-
-    /**
-     * 是否是 @Hide 注解
-     * @param annotationExpr
-     * @return
-     */
-    private boolean isHideAnnotation(AnnotationExpr annotationExpr) {
-        annotationExpr.getNameAsString().contains("Hide")
     }
 }

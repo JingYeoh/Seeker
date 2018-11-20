@@ -18,7 +18,6 @@ import javassist.bytecode.Descriptor
  */
 class MethodModifierProcessor extends BytecodeProcessor {
 
-    private static final String ANNOTATION_HIDE = "com.yeoh.seeker.annotation.Hide"
     private static final int LOG_LEVEL = 3
     static final String GROUP = "MethodModifier"
 
@@ -108,8 +107,8 @@ class MethodModifierProcessor extends BytecodeProcessor {
         ctMethod.methodInfo.attributes.forEach({
             if (it instanceof AnnotationsAttribute) {
                 for (annotation in it.getAnnotations()) {
-                    if (annotation.getTypeName() == ANNOTATION_HIDE) {
-                        it.removeAnnotation(ANNOTATION_HIDE)
+                    if (annotation.getTypeName() == DataSource.ANNOTATION_HIDE) {
+                        it.removeAnnotation(DataSource.ANNOTATION_HIDE)
                         Log.i(LOG_LEVEL + 1, GROUP, c.name + " has removed @Hide")
                     }
                 }
