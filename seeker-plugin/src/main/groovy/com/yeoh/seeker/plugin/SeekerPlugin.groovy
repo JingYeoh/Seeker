@@ -153,7 +153,7 @@ class SeekerPlugin implements Plugin<Project> {
         if (!mSeekerExtension.trickIDEA) {
             return
         }
-        TrickProcessor processor = new TrickProcessor(mProject)
+        TrickProcessor processor = new TrickProcessor(mProject, mSeekerExtension.sourcesJarTask)
         processor.process()
     }
 

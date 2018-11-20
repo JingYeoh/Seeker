@@ -16,6 +16,8 @@ class SeekerExtension {
     boolean trickIDEA = true
     // 是否 hook .class 文件
     boolean hookClass = true
+    // 执行源码打包的 task 名称
+    String sourcesJarTask = "sourcesJar"
 
     void copy(def seeker) {
         if (seeker == null) {
@@ -25,6 +27,9 @@ class SeekerExtension {
         debugEnable = seeker.debugEnable
         trickIDEA = seeker.trickIDEA
         hookClass = seeker.hookClass
+        if (seeker.sourcesJarTask != null && !seeker.sourcesJarTask.trim().isEmpty()) {
+            sourcesJarTask = seeker.sourcesJarTask
+        }
     }
 
     @Override
@@ -33,6 +38,8 @@ class SeekerExtension {
                 " | enable = ${enable}" +
                 " | debugEnable = ${debugEnable}" +
                 " | trickIDEA = ${trickIDEA}" +
-                " | hookClass = ${hookClass}"
+                " | hookClass = ${hookClass}" +
+                " | sourcesJarTask = ${sourcesJarTask}"
+
     }
 }

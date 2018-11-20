@@ -17,6 +17,7 @@ class TrickProcessor {
     private static final int LEVEL = 2
     private static final String GROUP = "TrickProcessor"
     private final Project mProject
+    private String mSourceJarTaskName
     private Task mSourcesJar
 
     private static String TEMP_SOURCES_ROOT = "build/Seeker/sources/"
@@ -24,8 +25,9 @@ class TrickProcessor {
     private Set mHookSourcesPath = []
     private Set mSourcesPath = []
 
-    TrickProcessor(Project project) {
+    TrickProcessor(Project project, String sourceJarTaskName) {
         mProject = project
+        mSourceJarTaskName = sourceJarTaskName
     }
 
     /**
@@ -49,22 +51,22 @@ class TrickProcessor {
      * 解析 sourceJar task，获取 from 参数
      */
     private void resolveSourcesJar() {
-        mSourcesJar = mProject.tasks.findByName("sourcesJar")
+        mSourcesJar = mProject.tasks.findByName(mSourceJarTaskName)
         if (mSourcesJar == null) {
-            ThrowExecutionError.throwError("can not find sourcesJar task, please check your gradle")
+            ThrowExecutionError.throwError("can not find ${mSourceJarTaskName} task, please check your gradle")
             return
         }
         Log.i(LEVEL + 1, GROUP, "find sourcesJar plugin")
         mSourcesJar.mainSpec.sourcePaths.forEach {
             Log.i(LEVEL + 1, GROUP, "source path = ${it}")
-            if (it as String) {
-                mSourcesPath.add(it)
-            } else if (it as Collection) {
+            if (it as Collection) {
                 Set<String> innerSources = []
                 it.forEach { innerIt ->
                     innerSources.add(innerIt)
                 }
                 mSourcesPath.add(innerSources)
+            } else if (it as String) {
+                mSourcesPath.add(it)
             }
         }
     }
