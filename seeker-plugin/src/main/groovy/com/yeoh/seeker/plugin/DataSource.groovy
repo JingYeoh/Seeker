@@ -8,6 +8,9 @@ package com.yeoh.seeker.plugin
  */
 class DataSource {
 
+    public static final String ANNOTATION_HIDE = "com.yeoh.seeker.annotation.Hide"
+    public static final String ENUM_MODIFIER = "com.yeoh.seeker.annotation.Modifier"
+
     def static seekerConfig = [:]
     private static Map<String, List<String>> processedRef = [:]
     // aar/jar　等解压后的路径，task　执行完毕后需要删除这些临时文件
