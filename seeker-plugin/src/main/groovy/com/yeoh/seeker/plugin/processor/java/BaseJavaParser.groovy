@@ -13,7 +13,7 @@ import com.yeoh.seeker.plugin.utils.ThrowExecutionError
 abstract class BaseJavaParser {
 
     protected static final int LEVEL = 4
-    protected String GROUP = getClass().getName()
+    protected String GROUP = getClass().getSimpleName()
 
     protected CompilationUnit mCompilationUnit
     protected File mJavaPath

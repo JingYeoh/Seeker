@@ -2,10 +2,10 @@ package com.yeoh.seeker.plugin.processor.java
 
 import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.Modifier
-import com.github.javaparser.ast.Node
 import com.github.javaparser.ast.body.MethodDeclaration
 import com.yeoh.seeker.plugin.DataSource
 import com.yeoh.seeker.plugin.utils.Log
+import com.yeoh.seeker.plugin.utils.ParserUtils
 
 import java.util.function.Consumer
 
@@ -16,6 +16,7 @@ import java.util.function.Consumer
  * @since 2018-11-19
  */
 class JavaMethodModifierParser extends BaseJavaParser {
+
 
     JavaMethodModifierParser(CompilationUnit compilationUnit, File javaPath) {
         super(compilationUnit, javaPath)
@@ -33,24 +34,8 @@ class JavaMethodModifierParser extends BaseJavaParser {
                     return
                 }
 
-                Log.i(LEVEL + 1, GROUP, "find @Hide in method ${methodDeclaration.name}")
-
                 hookMethodModifier(methodDeclaration)
                 hookMethodAnnotation(methodDeclaration)
-
-                Log.i(LEVEL + 1, GROUP, "method string: " + methodDeclaration.getDeclarationAsString())
-                Log.i(LEVEL + 1, GROUP, "method annotations: " + methodDeclaration.getAnnotations().toString())
-                Log.i(LEVEL + 1, GROUP, "method modifier: " + methodDeclaration.getModifiers().toString())
-                Log.i(LEVEL + 1, GROUP, "method type: " + methodDeclaration.type.toString())
-
-                // todo: 这一段代码是做什么的？
-                methodDeclaration.childNodes.forEach(new Consumer<Node>() {
-                    @Override
-                    void accept(Node node) {
-                        Log.i(LEVEL, GROUP, "method node: " + node.toString())
-                    }
-                })
-                Log.i(LEVEL, GROUP, "method: " + methodDeclaration.toString())
             }
         })
         hookClassImports()
@@ -62,16 +47,26 @@ class JavaMethodModifierParser extends BaseJavaParser {
      * @param methodDeclaration
      */
     private void hookMethodModifier(MethodDeclaration methodDeclaration) {
+        final Modifier targetModifier = ParserUtils.getMethodModifier(methodDeclaration)
+        if (targetModifier == null) {
+            return
+        }
         methodDeclaration.getModifiers().stream().forEach(new Consumer<Modifier>() {
             @Override
             void accept(Modifier modifier) {
                 //todo 需改到modifier指定的权限类型
-                if (modifier == Modifier.PUBLIC) {
-                    methodDeclaration.getModifiers().remove(modifier)
-                    methodDeclaration.setModifier(Modifier.PRIVATE, true)
-
-                    findHookTarget()
-                    Log.i(LEVEL + 1, GROUP, "hook method modifier success")
+                switch (modifier) {
+                    case Modifier.PUBLIC:
+                    case Modifier.PROTECTED:
+                    case Modifier.PRIVATE:
+                    case Modifier.DEFAULT:
+                        methodDeclaration.getModifiers().remove(modifier)
+                        methodDeclaration.setModifier(targetModifier, true)
+                        findHookTarget()
+                        Log.i(LEVEL + 1, GROUP, "hook method ${methodDeclaration.nameAsString} modifier to ${targetModifier}")
+                        break
+                    default:
+                        break
                 }
             }
         })
@@ -88,13 +83,10 @@ class JavaMethodModifierParser extends BaseJavaParser {
             int count = annotations.size()
             for (int i = count - 1; i >= 0; i--) {
                 def annotationExpr = annotations.get(i)
-                //todo 校验方式需review
-                if (isHideAnnotation(annotationExpr)) {
-                    methodDeclaration.getAnnotations().remove(annotationExpr)
+                methodDeclaration.getAnnotations().remove(annotationExpr)
 
-                    findHookTarget()
-                    Log.i(LEVEL + 1, GROUP, "remove @Hide for method ${methodDeclaration.name}")
-                }
+                findHookTarget()
+                Log.i(LEVEL + 1, GROUP, "remove @Hide for method ${methodDeclaration.name}")
             }
         }
     }
@@ -104,16 +96,17 @@ class JavaMethodModifierParser extends BaseJavaParser {
      */
     private void hookClassImports() {
         def imports = mCompilationUnit.imports
+        // 之所以要套一层，因为 直接在 forEach 中删除元素会打断当前循环... 未确认
+        Set seekerImports = []
         if (imports != null) {
-            imports.forEach({
-                //todo 校验方式需review
-                if (it.toString() == DataSource.ANNOTATION_HIDE ||
-                        it.toString() == DataSource.ENUM_MODIFIER) {
-                    imports.remove(importDeclaration)
-
-                    findHookTarget()
-                    Log.i(LEVEL + 1, GROUP, "remove import ${it} success")
+            imports.each {
+                if (it.nameAsString == DataSource.ANNOTATION_HIDE || it.nameAsString == DataSource.ENUM_MODIFIER) {
+                    seekerImports.add(it)
                 }
+            }
+            seekerImports.forEach({
+                imports.remove(it)
+                Log.i(LEVEL + 1, GROUP, "remove import ${it.nameAsString} success")
             })
         }
     }
@@ -125,11 +118,24 @@ class JavaMethodModifierParser extends BaseJavaParser {
      */
     private boolean checkHideAnnotation(MethodDeclaration methodDeclaration) {
         boolean hasHideAnnotation = false
+        // 是否 import @Hide
+        boolean isImportHideAnnotation = false
+        def imports = mCompilationUnit.imports
+        if (imports != null) {
+            imports.forEach({
+                if (it.nameAsString == DataSource.ANNOTATION_HIDE) {
+                    isImportHideAnnotation = true
+                }
+            })
+        }
+        // JavaParser 中返回的都是 String，所以可能无法定位到完整包名，所以需要和 import 一起判断
         def annotations = methodDeclaration.getAnnotations()
         for (int i = 0; i < annotations.size(); i++) {
             def annotationExpr = annotations.get(i)
-            annotationExpr.lis
             if (annotationExpr.nameAsString == DataSource.ANNOTATION_HIDE) {
+                hasHideAnnotation = true
+                break
+            } else if (annotationExpr.nameAsString == "Hide" && isImportHideAnnotation) {
                 hasHideAnnotation = true
                 break
             }
