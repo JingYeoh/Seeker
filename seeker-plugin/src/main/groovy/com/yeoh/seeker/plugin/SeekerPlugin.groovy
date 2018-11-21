@@ -141,7 +141,7 @@ class SeekerPlugin implements Plugin<Project> {
             return
         }
         // 处理 java sources 源码
-        processTrick()
+        processSources()
         // 处理字节码
         processVariant()
     }
@@ -149,11 +149,11 @@ class SeekerPlugin implements Plugin<Project> {
     /**
      * 执行处理 source 源码
      */
-    private void processTrick() {
+    private void processSources() {
         if (!mSeekerExtension.trickIDEA) {
             return
         }
-        TrickProcessor processor = new TrickProcessor(mProject, mSeekerExtension.sourcesJarTask)
+        SourceProcessor processor = new SourceProcessor(mProject, mSeekerExtension.sourcesJarTask)
         processor.process()
     }
 

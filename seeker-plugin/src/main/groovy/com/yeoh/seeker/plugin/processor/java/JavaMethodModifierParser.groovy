@@ -40,6 +40,7 @@ class JavaMethodModifierParser extends BaseJavaParser {
         })
         hookClassImports()
         writeToPath()
+        Log.ln(LEVEL, GROUP)
     }
 
     /**
@@ -54,7 +55,6 @@ class JavaMethodModifierParser extends BaseJavaParser {
         methodDeclaration.getModifiers().stream().forEach(new Consumer<Modifier>() {
             @Override
             void accept(Modifier modifier) {
-                //todo 需改到modifier指定的权限类型
                 switch (modifier) {
                     case Modifier.PUBLIC:
                     case Modifier.PROTECTED:

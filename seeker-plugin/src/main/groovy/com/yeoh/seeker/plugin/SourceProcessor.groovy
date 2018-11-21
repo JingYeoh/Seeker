@@ -12,10 +12,10 @@ import org.gradle.api.Task
  * @author Yeoh @ Zhihu Inc.
  * @since 2018/11/16
  */
-class TrickProcessor {
+class SourceProcessor {
 
     private static final int LEVEL = 2
-    private static final String GROUP = "TrickProcessor"
+    private static final String GROUP = "SourceProcessor"
     private final Project mProject
     private String mSourceJarTaskName
     private Task mSourcesJar
@@ -25,7 +25,7 @@ class TrickProcessor {
     private Set mHookSourcesPath = []
     private Set mSourcesPath = []
 
-    TrickProcessor(Project project, String sourceJarTaskName) {
+    SourceProcessor(Project project, String sourceJarTaskName) {
         mProject = project
         mSourceJarTaskName = sourceJarTaskName
     }
@@ -34,7 +34,7 @@ class TrickProcessor {
      * 开始处理
      */
     void process() {
-        Log.i(LEVEL, GROUP, "----------- TrickProcessor -----------")
+        Log.i(LEVEL, GROUP, "----------- SourceProcessor -----------")
         File rootHookSources = new File(TEMP_SOURCES_ROOT)
         if (!rootHookSources.exists()) {
             rootHookSources.mkdir()
@@ -102,6 +102,8 @@ class TrickProcessor {
      */
     private void processSources() {
         mSourcesJar.doFirst {
+            // 读取 seeker.json 配置
+            DataSource.configureSeeker()
             hookSources()
         }.doLast {
             deleteHookSourcesDir()

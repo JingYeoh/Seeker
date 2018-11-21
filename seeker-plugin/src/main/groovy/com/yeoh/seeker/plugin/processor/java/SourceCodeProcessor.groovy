@@ -63,14 +63,17 @@ class SourceCodeProcessor {
      * @param javaPath java　文件路径
      */
     private void hookJavaSourceCode(File javaPath) {
+        if (!javaPath.path.endsWith(".java")) {
+            return
+        }
         Log.i(LEVEL + 1, GROUP, "hook java source ${javaPath}")
         CompilationUnit compilationUnit = JavaParser.parse(javaPath)
         // hook method body
         JavaReferencedClassParser referencedClassParser = new JavaReferencedClassParser(compilationUnit, javaPath)
         referencedClassParser.hook()
         // hook method modifier
-        JavaMethodModifierParser methodModifierParser = new JavaMethodModifierParser(compilationUnit, javaPath)
-        methodModifierParser.hook()
+//        JavaMethodModifierParser methodModifierParser = new JavaMethodModifierParser(compilationUnit, javaPath)
+//        methodModifierParser.hook()
     }
 
 }
