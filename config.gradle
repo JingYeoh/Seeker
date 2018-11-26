@@ -34,10 +34,10 @@ ext {
             zhihu_gradle_plugin  : "3.0.1-47",
             kotlin               : "1.2.60",
 
-            seeker               : '0.0.1',
-            seeker_annotation    : "0.0.1",
-            seeker_processor     : "0.0.1",
-            seeker_plugin        : "0.0.1",
+            seeker               : '0.1.0',
+            seeker_annotation    : '0.1.0',
+            seeker_processor     : '0.1.0',
+            seeker_plugin        : '0.1.0',
 
             appcompat_V7         : "27.1.1",
             constraintLayout     : '1.1.3',

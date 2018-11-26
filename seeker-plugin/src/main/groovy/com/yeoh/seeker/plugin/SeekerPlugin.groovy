@@ -141,7 +141,7 @@ class SeekerPlugin implements Plugin<Project> {
             return
         }
         // 处理 java sources 源码
-        processSources()
+//        processSources()
         // 处理字节码
         processVariant()
     }

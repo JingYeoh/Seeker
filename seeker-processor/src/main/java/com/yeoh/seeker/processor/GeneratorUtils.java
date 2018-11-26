@@ -1,4 +1,4 @@
-package com.yeoh.seeker.processer;
+package com.yeoh.seeker.processor;
 
 class GeneratorUtils {
 

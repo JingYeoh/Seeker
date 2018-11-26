@@ -16,7 +16,7 @@ repositories {
 }
 
 group = seeker.groupId
-version = '0.0.1'
+version = '0.1.0'
 archivesBaseName = 'seeker-plugin'
 
 uploadArchives {
@@ -31,7 +31,7 @@ publish {
     userOrg = seeker.userOrg
     groupId = group
     artifactId = archivesBaseName
-    publishVersion = "0.0.1"
+    publishVersion = version
     desc = seeker.desc
     website = seeker.website
 }

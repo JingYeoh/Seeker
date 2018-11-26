@@ -11,7 +11,7 @@ sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
 group = seeker.groupId
-version = '0.0.1'
+version = '0.1.0'
 archivesBaseName = 'seeker-annotation'
 
 uploadArchives {
@@ -26,7 +26,7 @@ publish {
     userOrg = seeker.userOrg
     groupId = group
     artifactId = archivesBaseName
-    publishVersion = "0.0.1"
+    publishVersion = version
     desc = seeker.desc
     website = seeker.website
 }

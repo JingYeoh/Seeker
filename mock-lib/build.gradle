@@ -6,7 +6,7 @@ seeker {
     enable = true
     debugEnable = true
     trickIDEA = true
-    hookClass = false
+    hookClass = true
 }
 
 android {
@@ -49,9 +49,12 @@ artifacts {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(':seeker')
-//    implementation "com.yeoh:seeker:${ext.versions.seeker}"
-    annotationProcessor project(':seeker-processer')
+//    implementation project(':seeker')
+//    annotationProcessor project(':seeker-processor')
+
+    implementation "com.yeoh.seeker:seeker:${versions.seeker}"
+    implementation "com.yeoh.seeker:seeker-annotation:${versions.seeker_annotation}"
+    annotationProcessor "com.yeoh.seeker:seeker-processor:${versions.seeker_processor}"
 }
 
 group = 'com.yeoh.mock'

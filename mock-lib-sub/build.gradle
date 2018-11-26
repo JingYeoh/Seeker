@@ -34,8 +34,12 @@ dependencies {
 
 //    implementation project(path: ':mock-lib', configuration: 'default')
 //    implementation project(':mock-lib')
-    implementation project(':seeker')
-    annotationProcessor project(':seeker-processer')
+//    implementation project(':seeker')
+//    annotationProcessor project(':seeker-processor')
+
+    implementation "com.yeoh.seeker:seeker:${versions.seeker}"
+    implementation "com.yeoh.seeker:seeker-annotation:${versions.seeker_annotation}"
+    annotationProcessor "com.yeoh.seeker:seeker-processor:${versions.seeker_processor}"
 }
 
 group = 'com.yeoh.mock'

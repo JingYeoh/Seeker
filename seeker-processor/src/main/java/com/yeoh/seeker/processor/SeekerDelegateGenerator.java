@@ -1,9 +1,8 @@
-package com.yeoh.seeker.processer;
+package com.yeoh.seeker.processor;
 
 import android.support.annotation.NonNull;
 
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import com.yeoh.seeker.HideMethod;

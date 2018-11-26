@@ -1,4 +1,4 @@
-package com.yeoh.seeker.processer;
+package com.yeoh.seeker.processor;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
