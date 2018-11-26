@@ -1,5 +1,9 @@
 package com.yeoh.seeker.plugin
 
+import com.yeoh.seeker.plugin.utils.Log
+import com.yeoh.seeker.plugin.utils.ThrowExecutionError
+import groovy.json.JsonSlurper
+
 /**
  * 用于存储 SeekerExtension 的配置和临时的一些缓存
  *
@@ -7,6 +11,11 @@ package com.yeoh.seeker.plugin
  * @since 2018-09-27
  */
 class DataSource {
+
+    static final String PATH_SEEKER_JSON = "./build/Seeker/seeker.json"
+
+    public static final String ANNOTATION_HIDE = "com.yeoh.seeker.annotation.Hide"
+    public static final String ENUM_MODIFIER = "com.yeoh.seeker.annotation.Modifier"
 
     def static seekerConfig = [:]
     private static Map<String, List<String>> processedRef = [:]
@@ -50,5 +59,28 @@ class DataSource {
             return false
         }
         return referencedClasses.contains(referencedClass)
+    }
+
+    /**
+     * 配置 Seeker ，读取本地 json 文件
+     */
+    static void configureSeeker() {
+        if (!seekerConfig.isEmpty()) {
+            return
+        }
+        File configFile = new File(PATH_SEEKER_JSON)
+        if (configFile.exists()) {
+            def content = new StringBuilder()
+            configFile.eachLine("UTF-8") {
+                content.append(it)
+            }
+            Map data = new JsonSlurper().parseText(content.toString())
+            data.keySet().forEach {
+                seekerConfig.put(it, data.get(it))
+            }
+            Log.i(2, "Seeker", "read seeker config success...")
+        } else {
+            ThrowExecutionError.throwError("seeker.json does not exist")
+        }
     }
 }

@@ -1,8 +1,8 @@
 package com.yeoh.seeker.plugin
 
 
-import com.yeoh.seeker.plugin.processor.MethodModifierProcessor
-import com.yeoh.seeker.plugin.processor.ReferencedClassProcessor
+import com.yeoh.seeker.plugin.processor.bytecode.MethodModifierProcessor
+import com.yeoh.seeker.plugin.processor.bytecode.ReferencedClassProcessor
 import com.yeoh.seeker.plugin.utils.JarUtils
 import com.yeoh.seeker.plugin.utils.Log
 import javassist.ClassPool

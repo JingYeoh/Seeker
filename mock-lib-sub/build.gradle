@@ -1,18 +1,16 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
-apply plugin: 'seeker-plugin'
-
-def ext = rootProject.ext
+//apply plugin: 'seeker-plugin'
 
 android {
-    compileSdkVersion ext.android.compileSdkVersion
-    buildToolsVersion ext.android.buildToolsVersion
+    compileSdkVersion versions.compileSDK
+    buildToolsVersion versions.buildTool
 
     defaultConfig {
-        minSdkVersion ext.android.minSdkVersion
-        targetSdkVersion ext.android.targetSdkVersion
-        versionCode ext.app.targetSdkVersion
-        versionName ext.app.versionName
+        minSdkVersion versions.minSDK
+        targetSdkVersion versions.targetSDK
+        versionCode 1
+        versionName "0.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -51,7 +49,7 @@ uploadArchives {
     }
 }
 
-seeker{
-    enable = true
-    debugEnable = true
-}
+//seeker{
+//    enable = true
+//    debugEnable = true
+//}

@@ -12,6 +12,12 @@ class SeekerExtension {
     boolean enable = true
     // 是否打印日志
     boolean debugEnable = false
+    // IDEA 提示的是 java 源码，如果有的话，所以可以直接 hook java 源码
+    boolean trickIDEA = true
+    // 是否 hook .class 文件
+    boolean hookClass = true
+    // 执行源码打包的 task 名称
+    String sourcesJarTask = "sourcesJar"
 
     void copy(def seeker) {
         if (seeker == null) {
@@ -19,10 +25,21 @@ class SeekerExtension {
         }
         enable = seeker.enable
         debugEnable = seeker.debugEnable
+        trickIDEA = seeker.trickIDEA
+        hookClass = seeker.hookClass
+        if (seeker.sourcesJarTask != null && !seeker.sourcesJarTask.trim().isEmpty()) {
+            sourcesJarTask = seeker.sourcesJarTask
+        }
     }
 
     @Override
     String toString() {
-        return "seeker: " + "enable = " + enable + " | " + "debugEnable = " + debugEnable
+        return "seeker: " +
+                " | enable = ${enable}" +
+                " | debugEnable = ${debugEnable}" +
+                " | trickIDEA = ${trickIDEA}" +
+                " | hookClass = ${hookClass}" +
+                " | sourcesJarTask = ${sourcesJarTask}"
+
     }
 }

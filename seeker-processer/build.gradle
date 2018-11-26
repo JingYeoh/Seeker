@@ -1,19 +1,21 @@
 apply plugin: 'java-library'
 apply plugin: 'maven'
+apply plugin: 'com.novoda.bintray-release'
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.squareup:javapoet:1.9.0'
-    implementation 'com.google.auto.service:auto-service:1.0-rc3'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation "com.squareup:javapoet:${versions.javapoet}"
+    implementation "com.google.auto.service:auto-service:${versions.autoSerivice}"
+    implementation "com.google.code.gson:gson:${versions.gson}"
     implementation project(':seeker')
 }
 
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
-group = 'com.yeoh.seeker'
+group = seeker.groupId
 version = '0.0.1'
+archivesBaseName = 'seeker-processor'
 
 uploadArchives {
     repositories {
@@ -21,4 +23,13 @@ uploadArchives {
             repository(url: uri('../repo'))
         }
     }
+}
+
+publish {
+    userOrg = seeker.userOrg
+    groupId = group
+    artifactId = archivesBaseName
+    publishVersion = "0.0.1"
+    desc = seeker.desc
+    website = seeker.website
 }

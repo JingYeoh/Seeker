@@ -3,8 +3,6 @@ package com.yeoh.seeker.plugin
 import com.yeoh.seeker.plugin.utils.AarUtils
 import com.yeoh.seeker.plugin.utils.JarUtils
 import com.yeoh.seeker.plugin.utils.Log
-import com.yeoh.seeker.plugin.utils.ThrowExecutionError
-import groovy.json.JsonSlurper
 import javassist.ClassPool
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -16,8 +14,6 @@ import org.gradle.api.Task
  * @since 2018/11/13
  */
 class VariantProcessor {
-
-    static final String PATH_SEEKER_JSON = "./build/Seeker/seeker.json"
 
     private static final int LEVEL = 2
     private static final String GROUP = "VariantProcessor"
@@ -34,7 +30,7 @@ class VariantProcessor {
     /**
      * 处理 variant
      */
-    void processVariant() {
+    void process() {
 //        String taskPath = 'prepare' + mVariant.name.capitalize() + 'Dependencies'
 //        Task prepareTask = mProject.tasks.findByPath(taskPath)
 //        if (prepareTask == null) {
@@ -67,7 +63,8 @@ class VariantProcessor {
                 throw new RuntimeException("Can not find task ${taskPath}!")
             }
             syncLibTask.doFirst {
-                configureSeeker()
+                // 初始化 seeker 的配置
+                DataSource.configureSeeker()
                 configureClassPool()
                 File dustDir = mProject.file(mProject.buildDir.path + '/intermediates/packaged-classes/' + mVariant.dirName)
                 Log.i(LEVEL + 1, GROUP, "outputDir = " + dustDir)
@@ -110,26 +107,6 @@ class VariantProcessor {
                 Log.i(LEVEL + 1, GROUP, "find class jar : " + file)
             }
         })
-    }
-
-    /**
-     * 配置 Seeker ，读取本地 json 文件
-     */
-    private void configureSeeker() {
-        File configFile = new File(PATH_SEEKER_JSON)
-        if (configFile.exists()) {
-            def content = new StringBuilder()
-            configFile.eachLine("UTF-8") {
-                content.append(it)
-            }
-            Map data = new JsonSlurper().parseText(content.toString())
-            data.keySet().forEach {
-                DataSource.seekerConfig.put(it, data.get(it))
-            }
-            Log.i(LEVEL, GROUP, "read seeker config success...")
-        } else {
-            ThrowExecutionError.throwError("seeker.json does not exist")
-        }
     }
 
     /**

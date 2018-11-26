@@ -136,27 +136,43 @@ class SeekerPlugin implements Plugin<Project> {
      * 开始执行
      */
     private void doAction() {
-        mProject.extensions
         if (!mSeekerExtension.enable) {
             Log.i(LEVEL + 1, GROUP, "seeker plugin is not enabled!")
             return
         }
+        // 处理 java sources 源码
+        processSources()
+        // 处理字节码
+        processVariant()
+    }
 
+    /**
+     * 执行处理 source 源码
+     */
+    private void processSources() {
+        if (!mSeekerExtension.trickIDEA) {
+            return
+        }
+        SourceProcessor processor = new SourceProcessor(mProject, mSeekerExtension.sourcesJarTask)
+        processor.process()
+    }
+
+    /**
+     * 开始执行处理过程
+     */
+    private void processVariant() throws NotFoundException {
+        if (!mSeekerExtension.hookClass) {
+            return
+        }
         // 一般有 debug 和 release 两种 variant
         try {
             mProject.android.libraryVariants.all { variant ->
-                processVariant(variant)
+                // 处理 task
+                def processor = new VariantProcessor(mProject, mPool, variant)
+                processor.process()
             }
         } catch (NotFoundException e) {
             Log.i(LEVEL + 1, GROUP, e.message)
         }
-    }
-    /**
-     * 开始执行处理过程
-     */
-    private void processVariant(variant) throws NotFoundException {
-        // 处理 task
-        def processor = new VariantProcessor(mProject, mPool, variant)
-        processor.processVariant()
     }
 }

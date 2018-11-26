@@ -18,7 +18,7 @@ class Log {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    private static boolean ableDebug = true;
+    private static boolean ableDebug = false;
 
     private static void printWithColor(String info, String color) {
         if (ableDebug) {
