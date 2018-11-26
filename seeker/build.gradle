@@ -1,0 +1,32 @@
+apply plugin: 'java-library'
+apply plugin: 'maven'
+apply plugin: 'com.novoda.bintray-release'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api project(':seeker-annotation')
+}
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+group = seeker.groupId
+version = '0.1.0'
+archivesBaseName = 'seeker'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+        }
+    }
+}
+
+publish {
+    userOrg = seeker.userOrg
+    groupId = group
+    artifactId = archivesBaseName
+    publishVersion = version
+    desc = seeker.desc
+    website = seeker.website
+}

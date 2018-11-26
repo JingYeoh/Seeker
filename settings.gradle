@@ -1,0 +1,1 @@
+include ':app', ':seeker-annotation', ':seeker-processor', ':seeker-plugin', ':seeker', ':mock-lib-sub', ':mock-lib'

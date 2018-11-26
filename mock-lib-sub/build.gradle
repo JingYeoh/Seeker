@@ -1,0 +1,59 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven'
+//apply plugin: 'seeker-plugin'
+
+android {
+    compileSdkVersion versions.compileSDK
+    buildToolsVersion versions.buildTool
+
+    defaultConfig {
+        minSdkVersion versions.minSDK
+        targetSdkVersion versions.targetSDK
+        versionCode 1
+        versionName "0.0.1"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        moduleNameOfSeeker: 'mock-lib-sub'
+                ]
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+//    implementation project(path: ':mock-lib', configuration: 'default')
+//    implementation project(':mock-lib')
+//    implementation project(':seeker')
+//    annotationProcessor project(':seeker-processor')
+
+    implementation "com.yeoh.seeker:seeker:${versions.seeker}"
+    implementation "com.yeoh.seeker:seeker-annotation:${versions.seeker_annotation}"
+    annotationProcessor "com.yeoh.seeker:seeker-processor:${versions.seeker_processor}"
+}
+
+group = 'com.yeoh.mock'
+version = '0.0.1'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+        }
+    }
+}
+
+//seeker{
+//    enable = true
+//    debugEnable = true
+//}

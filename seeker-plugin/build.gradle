@@ -1,0 +1,37 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'com.novoda.bintray-release'
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+    implementation "com.android.tools.build:gradle:${versions.gradle_tools}"
+    implementation "org.javassist:javassist:${versions.javassist}"
+    implementation "org.jooq:joor:${versions.joor}"
+    implementation "com.github.javaparser:javaparser-core:${versions.javaparser_core}"
+}
+
+repositories {
+    mavenCentral()
+}
+
+group = seeker.groupId
+version = '0.1.0'
+archivesBaseName = 'seeker-plugin'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+        }
+    }
+}
+
+publish {
+    userOrg = seeker.userOrg
+    groupId = group
+    artifactId = archivesBaseName
+    publishVersion = version
+    desc = seeker.desc
+    website = seeker.website
+}
